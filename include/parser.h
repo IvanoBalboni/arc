@@ -59,9 +59,12 @@ extern int yydebug;
     FIN = 260,                     /* FIN  */
     SEP = 261,                     /* SEP  */
     AFFECT = 262,                  /* AFFECT  */
-    DECL = 263,                    /* DECL  */
-    NB = 264,                      /* NB  */
-    VAR = 265                      /* VAR  */
+    VAR = 263,                     /* VAR  */
+    TQ = 264,                      /* TQ  */
+    FAIRE = 265,                   /* FAIRE  */
+    FTQ = 266,                     /* FTQ  */
+    NB = 267,                      /* NB  */
+    ID = 268                       /* ID  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -70,14 +73,14 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 22 "src/parser.y"
+#line 25 "src/parser.y"
 
   int         nb;
-  char        var[32];
+  char        id[32];
   struct ast* tree;
  
 
-#line 81 "src/parser.h"
+#line 84 "src/parser.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

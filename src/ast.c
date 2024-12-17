@@ -1,7 +1,10 @@
 #include "ast.h"
+#include "codegen.h"
 
 static void PrintNB(ast *p, char * indent);
 static void PrintOP(ast *p, char * indent);
+static void PrintDECLA(ast *p, char * indent);
+static void PrintAFFECT(ast *p, char * indent);
 
 
 ast * CreerFeuilleNB(int nb){
@@ -13,6 +16,7 @@ ast * CreerFeuilleNB(int nb){
   val* n;
   if ((n = malloc(sizeof(int))) == NULL)
     ErrorAst("echec allocation mémoire");
+
   p->valeur = n;
   p->valeur->nb = nb;
 
@@ -20,23 +24,24 @@ ast * CreerFeuilleNB(int nb){
 }
 
 
-ast * CreerFeuilleDECLA(char* id){
+ast * CreerFeuilleDECLA(char* id, ast* suiv){
   ast * p;
   INIT_NOEUD(p);
   p->type = AST_NB;
   strcpy(p->type_str,"NB");
 
   val* n;
-  if ((n = malloc(sizeof(variable))) == NULL)
+  if ((n = malloc(sizeof(liste_decla))) == NULL)
     ErrorAst("echec allocation mémoire");
   p->valeur = n;
-  strcpy(p->valeur->var.id, id);
-  p->valeur->var.nb = 0;
+
+  strcpy(p->valeur->decla.id, id);
+  p->valeur->decla.suiv = suiv;
 
   return p;
 }
 
-ast * CreerFeuilleAFFECT(char* id, int nb){
+ast * CreerFeuilleAFFECT(char* id, ast* exp){
   ast * p;
   INIT_NOEUD(p);
   p->type = AST_NB;
@@ -46,14 +51,13 @@ ast * CreerFeuilleAFFECT(char* id, int nb){
   if ((n = malloc(sizeof(variable))) == NULL)
     ErrorAst("echec allocation mémoire");
   p->valeur = n;
-  strcpy(p->valeur->var.id, id);
-  p->valeur->var.nb = nb;
+
+  strcpy(p->valeur->id, id);
 
   return p;
 }
 
 ast * CreerNoeudOP(char op, ast* n1, ast* n2){
-  printf("noeud\n" );
   ast* p;
   INIT_NOEUD(p);
   p->type = AST_OP;
@@ -88,6 +92,12 @@ void PrintAst(ast * p, char* indent){
     PrintAst(p->valeur->op[1], indent);
     indent[len -4] = 0;
     break;
+  case AST_AFF:
+    PrintAFFECT(p, indent);
+    break;
+  case AST_DECL:
+    PrintDECLA(p, indent);
+    break;
   default:
     fprintf(stderr,"[Erreur] type <%d>: %s non reconnu\n",p->type,p->type_str);
     break;
@@ -108,4 +118,17 @@ static void PrintNB(ast *p, char *indent){
 static void PrintOP(ast *p, char *indent){
   printf("%s" TXT_BOLD TXT_BLUE "Noeud:  " TXT_NULL "%p\n",indent, p);
   printf("%s" TXT_BOLD "Ope:    " TXT_NULL "%s\n",indent, p->type_str);
+}
+
+
+static void PrintDECLA(ast *p, char * indent){
+  printf("%s" TXT_BOLD TXT_BLUE "Noeud:  " TXT_NULL "%p\n",indent, p);
+  printf("%s" TXT_BOLD "Type:   " TXT_NULL "%s\n",indent, p->type_str);
+  printf("%s" TXT_BOLD "Valeur: " TXT_NULL "%s\n",indent, p->valeur->decla.id);
+}
+
+static void PrintAFFECT(ast *p, char * indent){
+  printf("%s" TXT_BOLD TXT_BLUE "Noeud:  " TXT_NULL "%p\n",indent, p);
+  printf("%s" TXT_BOLD "Type:   " TXT_NULL "%s\n",indent, p->type_str);
+  printf("%s" TXT_BOLD "Valeur: " TXT_NULL "%s\n",indent, p->valeur->id);
 }

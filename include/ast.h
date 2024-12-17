@@ -19,20 +19,22 @@
     p->valeur = NULL;						\
   }								\
 
-enum {AST_NB = 256, AST_OP = 257} ;
+enum {AST_NB = 256, AST_OP = 257, AST_AFF = 258, AST_DECL = 259} ;
 
 typedef struct ast* noeudOP[2];
 
+typedef char variable[32];
+
 typedef struct{
-  //TODO: changer pour gerer correctement les adresses
-  int        nb;
-  char       id[32];
-}variable;
+  variable    id;
+  struct ast* suiv;
+}liste_decla;
 
 typedef union val{
   int         nb;
   noeudOP     op;
-  variable    var;
+  variable    id;
+  liste_decla decla;
 }val;
 
 
@@ -40,13 +42,14 @@ typedef union val{
 typedef struct ast{
   int  type;
   char type_str[32];
+  int  codelen;
   val  *valeur;
 } ast;
 
 
 ast * CreerFeuilleNB(int nb);
-ast * CreerFeuilleDECLA(char* id);
-ast * CreerFeuilleAFFECT(char* id, int nb);
+ast * CreerFeuilleDECLA(char* id, ast* suiv);
+ast * CreerFeuilleAFFECT(char* id, ast* exp);
 ast * CreerNoeudOP(char op, ast* n1, ast* n2);
 
 void FreeAst(ast * p);

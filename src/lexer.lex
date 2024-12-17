@@ -31,7 +31,7 @@
 %option yylineno
 
 NOMBRE          [0-9]+
-VAR             [a-zA-Z_][a-zA-Z_0-9]*
+ID              [a-zA-Z_][a-zA-Z_0-9]*
 
 
 %%
@@ -39,13 +39,16 @@ VAR             [a-zA-Z_][a-zA-Z_0-9]*
 [ \t\n]         { /* ignorer les blancs */ }
 {NOMBRE}        { yylval.nb = atoll(yytext); return NB; }
 "MAIN()"        { return MAIN;}
-"VAR"           { return DECL;}
+"VAR"           { return VAR;}
 "DEBUT"         { return DEBUT;}
 "FIN"           { return FIN;}
+"TQ"            { return TQ;}
+"FAIRE"         { return FAIRE;}
+"FTQ"           { return FTQ;}
 ";"             { return SEP;}
 "<-"            { return AFFECT;}
-[-+*/]          { return *yytext;}
-{VAR}           { strcpy(yylval.var, yytext); return VAR;}
+[-+*/()]        { return *yytext;}
+{ID}            { strcpy(yylval.id, yytext); return ID;}
 .               {
                   sprintf(errmsg,charerr, yytext[0]);
 		  yyerror(errmsg);

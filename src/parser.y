@@ -4,6 +4,9 @@
   #include <string.h>
 
   #include "ast.h"
+  #include "ts.h"
+  #include "codegen.h"
+  #include "semantic.h"
 
   extern int yylex();
   static void print_file_error(char * s, char *errmsg);
@@ -21,22 +24,23 @@
 
 %union{
   int         nb;
-  char        var[32];
+  char        id[32];
   struct ast* tree;
  };
 
 %define parse.error detailed
 %locations
 
-%type <tree> PROGRAMME INSTRUCTIONS INST EXP DECLARATIONS
+%type <tree> PROGRAMME INSTRUCTIONS INST EXP DECLARATIONS AFFECTATION
 
-%token MAIN DEBUT FIN SEP AFFECT DECL
+%token MAIN DEBUT FIN SEP AFFECT VAR TQ FAIRE FTQ
 %token <nb> NB
-%token <var> VAR
+%token <id> ID
 %start PROGRAMME
 
-%left '+' '-'
-%left '*' '/'
+%left  '+' '-'
+%left  '*' '/'
+%token '(' ')'
 
 %%
 
@@ -46,26 +50,29 @@ DECLARATIONS
 DEBUT
 INSTRUCTIONS
 FIN                             { $$ = $4; ARBRE_ABSTRAIT = $$; ARBRE_DECLARATION = $2;}
+;
 
-DECLARATIONS: DECL VAR SEP      { $$ = CreerFeuilleDECLA(yyval.var); ARBRE_DECLARATION = $$;}
-|DECL VAR SEP DECLARATIONS      { $$ = CreerFeuilleDECLA(yyval.var); ARBRE_DECLARATION = $$;}
-|                               { $$ = NULL;}
-
+DECLARATIONS:                   {  }
+|VAR ID SEP DECLARATIONS        { $$ = CreerFeuilleDECLA(yyval.id, $4);}
+;
 
 INSTRUCTIONS: INST SEP          { $$ = $1; }
 | INST SEP INSTRUCTIONS         { $$ = $1; }
+;
 
 INST: EXP                       { $$ = $1; }
 | AFFECTATION                   { $$ = $1; }
+;
 
-EXP : NB                        { $$ = CreerFeuilleNB(yyval.nb); }
+EXP : NB                        { $$ = CreerFeuilleNB(yyval.nb);  }
 | EXP '+' EXP                   { $$ = CreerNoeudOP('+', $1, $3); }
 | EXP '-' EXP                   { $$ = CreerNoeudOP('-', $1, $3); }
 | EXP '*' EXP                   { $$ = CreerNoeudOP('*', $1, $3); }
 | EXP '/' EXP                   { $$ = CreerNoeudOP('/', $1, $3); }
+| '(' EXP ')'                   { $$ = $2; }
 ;
 
-AFFECTATION: VAR AFFECT NB      { $$ = CreerFeuilleAFFECT(yyval.var, yyval.nb); }
+AFFECTATION: ID AFFECT EXP     { $$ = CreerFeuilleAFFECT(yyval.id, $3); }
 
 %%
 
@@ -91,6 +98,9 @@ int main( int argc, char * argv[] ) {
   exefile = fopen(exename,"w");
   yyparse();
   char indent[32] = "";
+  printf(TXT_BOLD "arbre declarations\n");
+  PrintAst( ARBRE_DECLARATION, indent);
+  printf(TXT_BOLD "arbre instructions\n");
   PrintAst( ARBRE_ABSTRAIT, indent);
   fclose(yyin);
 }
