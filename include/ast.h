@@ -23,7 +23,8 @@ enum {
   AST_LIRE = 253, AST_RETOURNE = 254,
   AST_NB   = 255, AST_ID   = 256, AST_OP  = 257,
   AST_INST = 258, AST_DECL = 259, AST_AFF = 260,
-  AST_SI   = 261, AST_TQ   = 262
+  AST_SI   = 261, AST_TQ   = 262,
+  AST_LIST = 263
 } ;
 
 typedef enum {
@@ -46,16 +47,16 @@ typedef struct{
   struct ast*    exp;
 }affectation;
 
-/*/declar pas propre, devrait separer declar list_declar
 typedef struct{
-  struct decla*  val;
-  struct ast*    suiv;
-}chaine_decla;
+  variable       id;
+  int            taille;
+}decla_liste;
 
 typedef struct{
-    variable       id;
-    struct ast*    exp;
-}decla;*/
+  variable       id;
+  struct ast*    pos;
+  struct ast*    exp;
+}affect_elem_liste;
 
 typedef struct{
   struct ast*    val;
@@ -74,15 +75,20 @@ typedef struct{
 }tant_que;
 
 typedef union val{
-  int           nb;
-  noeudOP       op;
-  variable      id;
-  affectation   affect;
-  affectation   decl;
-  instructions  inst;
-  condition     si;
-  tant_que      tq;
-  struct ast*   retourne;
+  int               nb;
+  variable          id;
+  affectation       elem_liste;
+  affect_elem_liste affect_liste;
+  instructions      liste;
+  decla_liste       decl_liste;
+  noeudOP           op;
+  affectation       appel;
+  affectation       affect;
+  affectation       decl;
+  instructions      inst;
+  condition         si;
+  tant_que          tq;
+  struct ast*       retourne;
 }valeur;
 
 
@@ -98,8 +104,14 @@ typedef struct ast{
 ast * CreerFeuilleNB(int nb);
 ast * CreerFeuilleID(char* id);
 
+ast * CreerFeuilleDECLALISTE(char* id, int taille);
+
 ast * CreerFeuilleDECLA(char* id, ast* exp);
 ast * CreerFeuilleAFFECT(char* id, ast* exp);
+
+ast * CreerNoeudLISTE(ast * exp, ast * suiv);
+ast * CreerFeuilleLIRE_ELEM_LISTE(char* id, ast* exp);
+ast * CreerFeuilleAFFECTLISTE(char* id, ast* pos, ast* exp);
 
 ast * CreerFeuilleLIRE();
 ast * CreerFeuilleRETOURNE(ast* exp);
@@ -108,6 +120,9 @@ ast * CreerNoeudOP(typeOP op, ast* n1, ast* n2);
 ast * CreerNoeudINSTRUCT(ast* inst, ast* suiv);
 ast * CreerNoeudSI(ast* exp, ast* alors,  ast* sinon);
 ast * CreerNoeudTQ(ast* exp, ast* faire);
+
+ast * CreerFONCTION(char* id, ast* param, ast* decla, ast* inst);
+ast * CreerAPPEL_FONCTION(char* id, ast* param);
 
 void FreeAst(ast * p);
 

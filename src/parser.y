@@ -11,8 +11,8 @@
   extern int yylex();
   static void print_file_error(char * s, char *errmsg);
 
+  struct ast * ARBRE_PRE_MAIN = NULL;
   struct ast * ARBRE_ABSTRAIT = NULL;
-
   struct ast * ARBRE_DECLARATION = NULL;
 
   table_symb * TABLE_SYMBOLES = NULL;
@@ -33,9 +33,9 @@
 %define parse.error detailed
 %locations
 
-%type <tree> PROGRAMME INSTRUCTIONS INST EXP DECLARATIONS DECLA AFFECTATION
+%type <tree> PROGRAMME PRE_MAIN FONCTION INSTRUCTIONS INST EXP DECLARATIONS DECLA AFFECTATION L_ID LISTE
 
-%token MAIN LIRE RETOURNE VAR DEBUT FIN SEP AFFECT
+%token MAIN ALGO LIRE RETOURNE VAR DEBUT FIN SEP AFFECT ','
 %token TQ FAIRE FTQ
 %token SI SINON FSI
 %token <nb> NB
@@ -53,37 +53,69 @@
 %%
 
 PROGRAMME:
+PRE_MAIN
 MAIN
 DECLARATIONS
 DEBUT
 INSTRUCTIONS
-FIN                             { $$ = $4; ARBRE_ABSTRAIT = $$; ARBRE_DECLARATION = $2;}
+FIN                             { 
+                                  ARBRE_PRE_MAIN = $1;
+                                  $$ = $5; ARBRE_ABSTRAIT = $$;
+                                  ARBRE_DECLARATION = $3;
+                                }
 ;
 
-DECLARATIONS:                   {  }
+PRE_MAIN: %empty                { $$ = NULL;}
+| VAR DECLA SEP PRE_MAIN        { $$ = CreerNoeudINSTRUCT($2, $4); }
+| FONCTION PRE_MAIN             { $$ = CreerNoeudINSTRUCT($1, $2); }
+;
+
+FONCTION:
+ALGO ID '(' L_PARAM ')'
+DECLARATIONS
+DEBUT
+INSTRUCTIONS
+FIN                             { $$ = CreerFONCTION(yyval.id, $4, $6, $8);}
+;
+
+L_PARAM: %empty                 { $$ = NULL; }
+|L_ID                           { $$ = $1;   }
+;
+
+L_ID: ID                        { $$ = CreerNoeudLISTE( CreerFeuilleID($1) , NULL); }
+| ID ',' L_ID                   { $$ = CreerNoeudLISTE( CreerFeuilleID($1) , $3);}
+;
+
+LISTE: EXP                      { $$ = CreerNoeudLISTE($1, NULL); }
+| EXP ',' LISTE                 { $$ = CreerNoeudLISTE($1, $3);   }
+;
+
+DECLARATIONS: %empty            { $$ = NULL;}
 | VAR DECLA SEP DECLARATIONS    { $$ = CreerNoeudINSTRUCT($2, $4);}
 ;
 
 
 INSTRUCTIONS: INST SEP          { $$ = CreerNoeudINSTRUCT($1, NULL); }
 | INST SEP INSTRUCTIONS         { $$ = CreerNoeudINSTRUCT($1, $3);   }
+;
+
+INST: EXP                       { $$ = $1; }
+| RETOURNE EXP                  { $$ = CreerFeuilleRETOURNE($2); }
+| VAR DECLA                     { $$ = $2; }
+| AFFECTATION                   { $$ = $1; }
 | SI EXP FAIRE INSTRUCTIONS FSI { $$ = CreerNoeudSI($2, $4, NULL);}
 | SI EXP FAIRE INSTRUCTIONS SINON INSTRUCTIONS FSI { $$ = CreerNoeudSI($2, $4, $6);}
 | TQ EXP FAIRE INSTRUCTIONS FTQ {$$ = CreerNoeudTQ($2, $4);}
 ;
 
-INST: EXP                       { $$ = $1; }
-| AFFECTATION                   { $$ = $1; }
-| RETOURNE EXP                  { $$ = CreerFeuilleRETOURNE($2); }
-| VAR DECLA                     { $$ = $2;}
-;
-
-DECLA: ID AFFECT EXP            {$$ = CreerFeuilleDECLA(yyval.id, $3);  }
+DECLA: ID AFFECT EXP            {$$ = CreerFeuilleDECLA(yyval.id, $3); /*TODO: marche pas*/ }
+| ID '[' NB ']'                 {$$ = CreerFeuilleDECLALISTE(yyval.id, yyval.nb);}
 | ID                            {$$ = CreerFeuilleDECLA(yyval.id, NULL);}
 ;
 
 EXP : NB                        { $$ = CreerFeuilleNB(yyval.nb); }
 | ID                            { $$ = CreerFeuilleID(yyval.id); }
+| ID '[' EXP ']'                { $$ = CreerFeuilleLIRE_ELEM_LISTE(yyval.id, $3); }
 | EXP '+' EXP                   { $$ = CreerNoeudOP(OP_PLUS,  $1, $3); }
 | EXP '-' EXP                   { $$ = CreerNoeudOP(OP_MOINS, $1, $3); }
 | EXP '*' EXP                   { $$ = CreerNoeudOP(OP_MULT,  $1, $3); }
@@ -99,9 +131,12 @@ EXP : NB                        { $$ = CreerFeuilleNB(yyval.nb); }
 | EXP ET EXP                    { $$ = CreerNoeudOP(OP_ET,    $1, $3); }
 | '(' EXP ')'                   { $$ = $2; }
 | LIRE                          { $$ = CreerFeuilleLIRE(); }
+| ID '(' LISTE ')'              { $$ = CreerAPPEL_FONCTION(yyval.id, $3); }
 ;
 
 AFFECTATION: ID AFFECT EXP     { $$ = CreerFeuilleAFFECT(yyval.id, $3); }
+| ID '[' EXP ']' AFFECT EXP    { $$ = CreerFeuilleAFFECTLISTE(yyval.id, $3, $5);}
+;
 
 %%
 

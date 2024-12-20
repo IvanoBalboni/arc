@@ -8,12 +8,12 @@ STORE 10      ; b <- ACC
 LOAD 10       ; ACC <- valeur de b
 STORE 20      ; EMPILER( ACC )
 LOAD 9        ; ACC <- valeur de a
-JUMZ 16       ; (DEBUT OP ET) //JUMP 5 lignes en dessous si GAUCHE ET est faux 
+JUMZ 16       ; (DEBUT OP ET) // JUMP 5 lignes en dessous si GAUCHE ET est faux 
 LOAD 20       ; ACC <- ACC - DEPILER( )
 JUMZ 16       ; JUMP 3 lignes en dessous si ET est faux 
 LOAD #1       ; ACC <- 1 car ET est vrai 
-JUMP 11       ; (FIN OP ET) JUMP 2 lignes au dessous si ET est vrai
-LOAD #0       ; (FIN OP ET) ACC <- 0 car OU est faux 
+JUMP 11       ; (FIN OP ET) // JUMP 2 lignes au dessous
+LOAD #0       ; (FIN OP ET) // ACC <- 0 car OU est faux 
 STORE 11      ; c <- ACC
 LOAD 11       ; ACC <- valeur de c
 WRITE         ; ACC <- ENTREE[I++]

@@ -2,8 +2,6 @@
 #include "ast.h"
 #include "ts.h"
 
-int VARIABLES = 9;
-int PILE = 20;
 int LEN  = 0;
 
 void codegen_init(){
@@ -68,6 +66,7 @@ void codegenOP(ast* p){
   */
   codegen(p->val->op.val[1]);
   //TODO: temp
+  //TODO: STORE 1 
   genPrintVal("STORE %-7d ; ","EMPILER( ACC )\n", PILE);
     EMPILER();
   codegen(p->val->op.val[0]);
@@ -206,6 +205,8 @@ void codegenFIN(){
   LEN++;
   fprintf(exefile, "STOP\n" );
 }
+
+void EMPILER()
 
 void genPrintVal(char* line, char* comment, int val){
   LEN++;

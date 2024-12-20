@@ -8,10 +8,11 @@
 #include "ast.h"
 
 typedef enum{
-  TS_END = 64, TS_ID = 65, TS_DECLA = 66, TS_AFFECT = 67
+  TS_ID  = 64, TS_L_ID = 65, TS_DECLA = 66, TS_AFFECT = 67,
+  TS_FCT = 68
 }Type;
 
-typedef enum{
+typedef enum{//TODO: devient string pour gerer contexte fct?
   GLOBAL = 0, LOCAL = 1
 }contexte;
 
