@@ -16,41 +16,82 @@
   else {							\
     p->type = 0;						\
     p->type_str[0] = '\0';					\
-    p->valeur = NULL;						\
+    p->val = NULL;						\
   }								\
 
-enum {AST_NB = 256, AST_OP = 257, AST_AFF = 258, AST_DECL = 259} ;
+enum {
+  AST_LIRE = 253, AST_RETOURNE = 254,
+  AST_NB   = 255, AST_ID   = 256, AST_OP  = 257,
+  AST_INST = 258, AST_DECL = 259, AST_AFF = 260
+} ;
 
-typedef struct ast* noeudOP[2];
+typedef enum {
+  OP_PLUS = 512, OP_MOINS = 513, OP_MULT = 514, OP_DIV  = 515, OP_MOD = 516,
+  OP_INF  = 517, OP_SINF  = 518, OP_SUP  = 519, OP_SSUP = 520,
+  OP_EGAL = 521, OP_DIFF  = 522, OP_OU   = 523, OP_ET   = 524
+}typeOP;
+
+
+typedef struct{
+  typeOP      type;
+  struct ast* val[2];
+} noeudOP;
 
 typedef char variable[32];
 
+
 typedef struct{
-  variable    id;
-  struct ast* suiv;
-}liste_decla;
+  variable       id;
+  struct ast*    exp;
+}affectation;
+
+/*/declar pas propre, devrait separer declar list_declar
+typedef struct{
+  struct decla*  val;
+  struct ast*    suiv;
+}chaine_decla;
+
+typedef struct{
+    variable       id;
+    struct ast*    exp;
+}decla;*/
+
+typedef struct{
+  struct ast*    val;
+  struct ast*    suiv;
+}instructions;
 
 typedef union val{
-  int         nb;
-  noeudOP     op;
-  variable    id;
-  liste_decla decla;
-}val;
+  int           nb;
+  noeudOP       op;
+  variable      id;
+  affectation   affect;
+  affectation   decl;
+  instructions  inst;
+  struct ast*   retourne;
+}valeur;
 
 
 
 typedef struct ast{
-  int  type;
-  char type_str[32];
-  int  codelen;
-  val  *valeur;
+  int     type;
+  char    type_str[32];
+  int     codelen;
+  valeur* val;
 } ast;
 
 
 ast * CreerFeuilleNB(int nb);
-ast * CreerFeuilleDECLA(char* id, ast* suiv);
+ast * CreerFeuilleID(char* id);
+
+ast * CreerFeuilleDECLA(char* id, ast* exp);
 ast * CreerFeuilleAFFECT(char* id, ast* exp);
-ast * CreerNoeudOP(char op, ast* n1, ast* n2);
+
+ast * CreerFeuilleLIRE();
+ast * CreerFeuilleRETOURNE(ast* exp);
+
+ast * CreerNoeudOP(typeOP op, ast* n1, ast* n2);
+ast * CreerNoeudINSTRUCT(ast* inst, ast* suiv);
 
 void FreeAst(ast * p);
 

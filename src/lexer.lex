@@ -39,15 +39,26 @@ ID              [a-zA-Z_][a-zA-Z_0-9]*
 [ \t\n]         { /* ignorer les blancs */ }
 {NOMBRE}        { yylval.nb = atoll(yytext); return NB; }
 "MAIN()"        { return MAIN;}
+"LIRE()"        { return LIRE;}
+"RETOURNE"      { return RETOURNE;}
 "VAR"           { return VAR;}
 "DEBUT"         { return DEBUT;}
 "FIN"           { return FIN;}
+";"             { return SEP;}
+"SI"            { return SI;}
+"SINON"         { return SINON;}
+"FSI"           { return FSI;}
 "TQ"            { return TQ;}
 "FAIRE"         { return FAIRE;}
 "FTQ"           { return FTQ;}
-";"             { return SEP;}
+"OU"            { return OU;}
+"ET"            { return ET;}
 "<-"            { return AFFECT;}
-[-+*/()]        { return *yytext;}
+"<="            { return INF;}
+">="            { return SUP;}
+"!="            { return DIFF;}
+"="             { return EGAL;}
+[-+*/%()<>]     { return *yytext;}
 {ID}            { strcpy(yylval.id, yytext); return ID;}
 .               {
                   sprintf(errmsg,charerr, yytext[0]);

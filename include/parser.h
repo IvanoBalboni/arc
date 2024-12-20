@@ -55,16 +55,27 @@ extern int yydebug;
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
     MAIN = 258,                    /* MAIN  */
-    DEBUT = 259,                   /* DEBUT  */
-    FIN = 260,                     /* FIN  */
-    SEP = 261,                     /* SEP  */
-    AFFECT = 262,                  /* AFFECT  */
-    VAR = 263,                     /* VAR  */
-    TQ = 264,                      /* TQ  */
-    FAIRE = 265,                   /* FAIRE  */
-    FTQ = 266,                     /* FTQ  */
-    NB = 267,                      /* NB  */
-    ID = 268                       /* ID  */
+    LIRE = 259,                    /* LIRE  */
+    RETOURNE = 260,                /* RETOURNE  */
+    VAR = 261,                     /* VAR  */
+    DEBUT = 262,                   /* DEBUT  */
+    FIN = 263,                     /* FIN  */
+    SEP = 264,                     /* SEP  */
+    AFFECT = 265,                  /* AFFECT  */
+    TQ = 266,                      /* TQ  */
+    FAIRE = 267,                   /* FAIRE  */
+    FTQ = 268,                     /* FTQ  */
+    SI = 269,                      /* SI  */
+    SINON = 270,                   /* SINON  */
+    FSI = 271,                     /* FSI  */
+    NB = 272,                      /* NB  */
+    ID = 273,                      /* ID  */
+    OU = 274,                      /* OU  */
+    ET = 275,                      /* ET  */
+    EGAL = 276,                    /* EGAL  */
+    DIFF = 277,                    /* DIFF  */
+    INF = 278,                     /* INF  */
+    SUP = 279                      /* SUP  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -73,14 +84,14 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 25 "src/parser.y"
+#line 27 "src/parser.y"
 
   int         nb;
   char        id[32];
   struct ast* tree;
  
 
-#line 84 "src/parser.h"
+#line 95 "src/parser.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

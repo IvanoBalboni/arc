@@ -1,0 +1,10 @@
+MAIN()
+VAR a;
+VAR b;
+VAR c;
+DEBUT
+a <- LIRE();
+b <- LIRE();
+c <- a ET b;
+RETOURNE c;
+FIN
