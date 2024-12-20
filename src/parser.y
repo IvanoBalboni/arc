@@ -67,6 +67,9 @@ DECLARATIONS:                   {  }
 
 INSTRUCTIONS: INST SEP          { $$ = CreerNoeudINSTRUCT($1, NULL); }
 | INST SEP INSTRUCTIONS         { $$ = CreerNoeudINSTRUCT($1, $3);   }
+| SI EXP FAIRE INSTRUCTIONS FSI { $$ = CreerNoeudSI($2, $4, NULL);}
+| SI EXP FAIRE INSTRUCTIONS SINON INSTRUCTIONS FSI { $$ = CreerNoeudSI($2, $4, $6);}
+| TQ EXP FAIRE INSTRUCTIONS FTQ {$$ = CreerNoeudTQ($2, $4);}
 ;
 
 INST: EXP                       { $$ = $1; }

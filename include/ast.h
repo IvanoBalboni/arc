@@ -22,7 +22,8 @@
 enum {
   AST_LIRE = 253, AST_RETOURNE = 254,
   AST_NB   = 255, AST_ID   = 256, AST_OP  = 257,
-  AST_INST = 258, AST_DECL = 259, AST_AFF = 260
+  AST_INST = 258, AST_DECL = 259, AST_AFF = 260,
+  AST_SI   = 261, AST_TQ   = 262
 } ;
 
 typedef enum {
@@ -61,6 +62,17 @@ typedef struct{
   struct ast*    suiv;
 }instructions;
 
+typedef struct{
+  struct ast*    exp;
+  struct ast*    alors;
+  struct ast*    sinon;
+}condition;
+
+typedef struct{
+  struct ast*    exp;
+  struct ast*    faire;
+}tant_que;
+
 typedef union val{
   int           nb;
   noeudOP       op;
@@ -68,6 +80,8 @@ typedef union val{
   affectation   affect;
   affectation   decl;
   instructions  inst;
+  condition     si;
+  tant_que      tq;
   struct ast*   retourne;
 }valeur;
 
@@ -92,6 +106,8 @@ ast * CreerFeuilleRETOURNE(ast* exp);
 
 ast * CreerNoeudOP(typeOP op, ast* n1, ast* n2);
 ast * CreerNoeudINSTRUCT(ast* inst, ast* suiv);
+ast * CreerNoeudSI(ast* exp, ast* alors,  ast* sinon);
+ast * CreerNoeudTQ(ast* exp, ast* faire);
 
 void FreeAst(ast * p);
 

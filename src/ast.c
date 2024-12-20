@@ -153,6 +153,42 @@ ast * CreerNoeudINSTRUCT(ast* inst, ast* suiv){
   return p;
 }
 
+ast * CreerNoeudSI(ast* exp, ast* alors,  ast* sinon){
+  ast * p;
+  INIT_NOEUD(p);
+  p->type = AST_SI;
+  strcpy(p->type_str,"SI");
+
+  valeur* n;
+  if ((n = malloc(sizeof(instructions))) == NULL)
+    ErrorAst("echec allocation mémoire");
+  p->val = n;
+
+  p->val->si.exp = exp;
+  p->val->si.alors = alors;
+  p->val->si.sinon = sinon;
+
+  return p;
+}
+
+ast * CreerNoeudTQ(ast* exp, ast* faire){
+  ast * p;
+  INIT_NOEUD(p);
+  p->type = AST_TQ;
+  strcpy(p->type_str,"TQ");
+
+  valeur* n;
+  if ((n = malloc(sizeof(instructions))) == NULL)
+    ErrorAst("echec allocation mémoire");
+  p->val = n;
+
+  p->val->tq.exp = exp;
+  p->val->tq.faire = faire;
+
+  return p;
+}
+
+
 void FreeAst(ast * p){
   if (p == NULL) return;
   free(p);
@@ -180,6 +216,12 @@ void PrintAst(ast * p, char* indent){
     PrintINST(p, indent);
     if(p->val->inst.suiv != NULL)
       PrintAst(p->val->inst.suiv, indent);
+    break;
+  case AST_SI:
+  printf("TODO\n");
+    break;
+  case AST_TQ:
+  printf("TODO\n");
     break;
   case AST_LIRE:
     PrintLIRE(p, indent);
