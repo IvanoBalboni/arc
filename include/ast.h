@@ -20,12 +20,16 @@
   }								\
 
 enum {
-  AST_LIRE = 253, AST_RETOURNE = 254,
+  AST_LIRE = 252, AST_ECRIRE = 253, AST_RETOURNE = 254,
   AST_NB   = 255, AST_ID   = 256, AST_OP  = 257,
   AST_INST = 258, AST_DECL = 259, AST_AFF = 260,
   AST_SI   = 261, AST_TQ   = 262,
-  AST_LIST = 263
+  AST_FCT  = 263, AST_APPEL_FCT = 264,
+  AST_LIST = 265,
+  AST_IDL  = 266, AST_DECL_IDL = 267, AST_AFF_IDL = 268
 } ;
+//un ID peut avoir le meme nom qu'une liste / fonction.
+//les 3 peuvent cohabiter et fonctionnent toutes correctement.
 
 typedef enum {
   OP_PLUS = 512, OP_MOINS = 513, OP_MULT = 514, OP_DIV  = 515, OP_MOD = 516,
@@ -40,7 +44,6 @@ typedef struct{
 } noeudOP;
 
 typedef char variable[32];
-
 
 typedef struct{
   variable       id;
@@ -63,6 +66,11 @@ typedef struct{
   struct ast*    suiv;
 }instructions;
 
+typedef struct{//stocke le memes donnees que instructions mais a un role different
+  struct ast*    exp;
+  struct ast*    faire;
+}tant_que;
+
 typedef struct{
   struct ast*    exp;
   struct ast*    alors;
@@ -70,24 +78,29 @@ typedef struct{
 }condition;
 
 typedef struct{
-  struct ast*    exp;
-  struct ast*    faire;
-}tant_que;
+  variable       id;
+  struct ast*    param;
+  struct ast*    decl_liste;
+  struct ast*    inst;
+}decl_fonction;
+
 
 typedef union val{
   int               nb;
   variable          id;
-  affectation       elem_liste;
-  affect_elem_liste affect_liste;
-  instructions      liste;
-  decla_liste       decl_liste;
-  noeudOP           op;
-  affectation       appel;
+  affectation       decl;   //peut affecter dans la decl
   affectation       affect;
-  affectation       decl;
+  affectation       elem_liste;  //id[exp] renvoie l'elem
+  decla_liste       decl_liste;
+  affect_elem_liste affect_liste;  // peut faire id[a*5+2] <- exp
+  instructions      liste;   // liste d'exp
+  decl_fonction     algo;
+  affectation       appel;  //id fonction, liste
+  noeudOP           op;
   instructions      inst;
   condition         si;
   tant_que          tq;
+  struct ast*       ecrire;
   struct ast*       retourne;
 }valeur;
 
@@ -104,20 +117,22 @@ typedef struct ast{
 ast * CreerFeuilleNB(int nb);
 ast * CreerFeuilleID(char* id);
 
-ast * CreerFeuilleDECLALISTE(char* id, int taille);
+ast * CreerFeuilleLIRE();
+ast * CreerFeuilleECRIRE(ast * exp);
+ast * CreerFeuilleRETOURNE(ast* exp);
 
 ast * CreerFeuilleDECLA(char* id, ast* exp);
 ast * CreerFeuilleAFFECT(char* id, ast* exp);
 
+ast * CreerFeuilleDECLALISTE(char* id, int taille);
 ast * CreerNoeudLISTE(ast * exp, ast * suiv);
+
 ast * CreerFeuilleLIRE_ELEM_LISTE(char* id, ast* exp);
 ast * CreerFeuilleAFFECTLISTE(char* id, ast* pos, ast* exp);
 
-ast * CreerFeuilleLIRE();
-ast * CreerFeuilleRETOURNE(ast* exp);
-
 ast * CreerNoeudOP(typeOP op, ast* n1, ast* n2);
 ast * CreerNoeudINSTRUCT(ast* inst, ast* suiv);
+
 ast * CreerNoeudSI(ast* exp, ast* alors,  ast* sinon);
 ast * CreerNoeudTQ(ast* exp, ast* faire);
 

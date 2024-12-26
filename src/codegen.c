@@ -3,16 +3,70 @@
 #include "ts.h"
 
 int LEN  = 0;
+//libere les variables en sortant du contexte (PILE - NB_VARIABLES)
+//
+int NB_VARIABLES = 0;
 
-void codegen_init(){
+int CONTEXTE_CHGT = 1;
+
+void codegenInit(){
+  //l'adresse de la pile sera connue une fois sorti de GLOBAL et modifie a ce moment >> besoin de fopen "w+"
+  genPrintVal("LOAD #%-7d ; ", "init l'adresse de la pile\n", -20);
+  genPrintVal("STORE %-7d ; ", "PILE <- ACC\n", PILE);
+  //l'adresse de main() sera connue une fois au debut de MAIN et modifie a ce moment
+  genPrintVal("JUMP %-8d ; ", "JUMP a la 1ere instruction de MAIN()\n", -20);
+
   //TODO: PILE LEN VARIBLES etc. tec.
+}
+
+void codegenInitMAIN(){
+  CONTEXTE_CHGT = 0;
+  char temp[128];
+
+  if (fseek(exefile, 6, SEEK_SET) != 0)
+    printf("CONDEGEN INIT MAIN NON \n#\n#\n");
+  fprintf(exefile, "%-6d", NB_VARIABLES + 8);
+  for (size_t i = 0; i < 2; i++){//passe la ligne courante et la suivante
+    fscanf(exefile,"%[^\n]",temp);
+    fscanf(exefile,"%c",temp);
+  }
+  
+  if (fseek(exefile, 5, SEEK_CUR) != 0)
+    printf("CONDEGEN INIT MAIN NON \n#\n#\n");
+  fprintf(exefile, "%-8d", LEN);
+
+  fseek(exefile, 0, SEEK_END);
+  genPrintVal("LOAD %-8d ; ", "(DEBUT MAIN) // ACC <- PILE\n", PILE);
+  genPrintVal("STORE %-7d ; ", "LOCAL <- ACC\n", LOCAL);
+
+}
+
+void codegenInitCONTEXTE(){
+
+}
+
+void codegenCHGT_PILE(int sortie_contexte){
+  if (sortie_contexte){
+
+  }else{
+    genPrintVal("LOAD #%-7d ; ", "ACC <- NB Variabls declarees\n", NB_VARIABLES);
+    genPrintVal("ADD %-9d ; "," ACC <- ACC + ADRESSE PILE\n", PILE);
+  genPrintVal("STORE %-7d ; ", "Avance la PILE du nombre de DECL\n", PILE );
+  }
 }
 
 void codegen(ast* p){
   if (p == NULL) return;
+  if (CONTEXTE_CHGT){
+    if (strcmp(CONTEXTE, "MAIN") == 0)
+      codegenInitMAIN();
+    else
+      codegenInitCONTEXTE();
+  }
+
   switch(p->type){
   case AST_LIRE:
-  codegenLIRE(p);
+    codegenLIRE(p);
   break;
   case AST_RETOURNE:
     codegenRETOURNE(p);
@@ -51,11 +105,28 @@ void codegenNB(ast* p){
 }
 
 void codegenID(ast* p){
-  //TODO: ts match
-  symbole * s = RechercherSymb(TABLE_SYMBOLES, p->val->id, TS_ID, LOCAL );
+  symbole * s = RechercherSymb(TABLE_SYMBOLES, p->val->id, TS_AFFECT);
+  if(s == NULL){
+    fprintf(stderr,"codegen ID, symbole non affecte.");
+    exit(1);
+  }
+
   char comment[64];
-  sprintf(comment, "ACC <- valeur de %s\n", p->val->id);
-  genPrintVal("LOAD %-8d ; ", comment, VARIABLES + s->adr);
+  if(CHERCHE_SYMB_GLOBAL){
+    sprintf(comment, "(DEBUT ID) // ACC <- adresse GLOBAL\n");
+    genPrintVal("LOAD %-8d ; ", comment, GLOBAL );
+  }
+  else{
+    sprintf(comment, "(DEBUT ID) // ACC <- adresse LOCAL\n");
+    genPrintVal("LOAD %-8d ; ", comment, LOCAL );
+  }
+  sprintf(comment, "ACC + position relative de  %s\n",s->id);
+  genPrintVal("ADD #%-8d ; ", comment, s->adr );
+
+  STOCKER("TEMP <- ACC (ID)\n");
+
+  sprintf(comment, "ACC <- %s\n",s->id);
+  genPrintVal("LOAD @%-7d ; ", comment, TEMP );
 }
 
 void codegenOP(ast* p){
@@ -65,36 +136,46 @@ void codegenOP(ast* p){
    * et stocke le resultat dans l'acc.
   */
   codegen(p->val->op.val[1]);
+  EMPILER(0,"(DEBUT OP) // EMPILE EXP2 de l'op : EXP1 OP EXP2\n");
   //TODO: temp
-  //TODO: STORE 1 
-  genPrintVal("STORE %-7d ; ","EMPILER( ACC )\n", PILE);
-    EMPILER();
+  //TODO: STORE 1
   codegen(p->val->op.val[0]);
+  EMPILER(0,"EMPILE EXP1 de l'op : EXP1 OP EXP2\n");
 
   switch (p->val->op.type) {
     case OP_PLUS:
-      DEPILER();
-      genPrintVal("ADD %-9d ; ","ACC <- ACC + DEPILER( )\n", PILE);
+      DEPILER("EXP2\n");
+      STOCKER("TEMP <- ACC (EXP2)\n");
+      DEPILER("EXP1\n");
+      genPrintVal("ADD %-9d ; ","(FIN OP +) // ACC <- ACC (EXP1) + TEMP (EXP2)\n", TEMP);
     break;
     case OP_MOINS:
-      DEPILER();
-      genPrintVal("SUB %-9d ; ","ACC <- ACC - DEPILER( )\n", PILE);
+      DEPILER("EXP2\n");
+      STOCKER("TEMP <- ACC (EXP2)\n");
+      DEPILER("EXP1\n");
+      genPrintVal("SUB %-9d ; ","(FIN OP -) // ACC <- ACC (EXP1) - TEMP (EXP2)\n", TEMP);
     break;
     case OP_MULT:
-      DEPILER();
-      genPrintVal("MUL %-9d ; ","ACC <- ACC * DEPILER( )\n", PILE);
+      DEPILER("EXP2\n");
+      STOCKER("TEMP <- ACC (EXP2)\n");
+      DEPILER("EXP1\n");
+      genPrintVal("MUL %-9d ; ","(FIN OP *) // ACC <- ACC (EXP1) * TEMP (EXP2)\n", TEMP);
     break;
     case OP_DIV:
-      DEPILER();
-      genPrintVal("DIV %-9d ; ","ACC <- ACC / DEPILER( )\n", PILE);
+      DEPILER("EXP2\n");
+      STOCKER("TEMP <- ACC (EXP2)\n");
+      DEPILER("EXP1\n");
+      genPrintVal("DIV %-9d ; ","(FIN OP /) // ACC <- ACC (EXP1) / TEMP (EXP2)\n", TEMP);
     break;
     case OP_MOD:
-      DEPILER();
-      genPrintVal("MOD %-9d ; ","ACC <- ACC % DEPILER( )\n", PILE);
+      DEPILER("EXP2\n");
+      STOCKER("TEMP <- ACC (EXP2)\n");
+      DEPILER("EXP1\n");
+      genPrintVal("MOD %-9d ; ","(FIN OP %) // ACC <- ACC (EXP1) % TEMP (EXP2)\n", TEMP);
     break;
     case OP_INF://TODO:
-      DEPILER();
-      genPrintVal("SUB %-9d ; ","(DEBUT OP <=) // ACC <- ACC - DEPILER( )\n", PILE);
+      DEPILER("");
+      genPrintVal("SUB %-9d ; ","(DEBUT OP <=) // ACC <- ACC - DEPILER( )\n", TEMP);
       genPrintVal("DEC %-9d ; ","ACC <- ACC - 1\n", 0);
       genPrintVal("JUML %-8d ; ","JUMP 3 lignes en dessous si <= est vrai \n", LEN +4);
       genPrintVal("LOAD #%-7d ; ", "ACC <- 0 car <= est faux \n", 0);
@@ -102,16 +183,16 @@ void codegenOP(ast* p){
       genPrintVal("LOAD #%-7d ; ", "(FIN OP <=) // ACC <- 1 car <= est vrai\n", 1);
     break;
     case OP_SINF:
-      DEPILER();
-      genPrintVal("SUB %-9d ; ","(DEBUT OP <) // ACC <- ACC - DEPILER( )\n", PILE);
+      DEPILER("");
+      genPrintVal("SUB %-9d ; ","(DEBUT OP <) // ACC <- ACC - DEPILER( )\n", TEMP);
       genPrintVal("JUML %-8d ; ","JUMP 3 lignes en dessous si <= est vrai \n", LEN +4);
       genPrintVal("LOAD #%-7d ; ", "ACC <- 0 car < est faux \n", 0);
       genPrintVal("JUMP %-8d ; ","(FIN OP <=) // JUMP 2 lignes en dessous\n", LEN +3);
       genPrintVal("LOAD #%-7d ; ", "(FIN OP <=) // ACC <- 1 car < est vrai\n", 1);
     break;
     case OP_SUP:
-      DEPILER();
-      genPrintVal("SUB %-9d ; ","(DEBUT OP >=) // ACC <- ACC - DEPILER( )\n", PILE);
+      DEPILER("");
+      genPrintVal("SUB %-9d ; ","(DEBUT OP >=) // ACC <- ACC - DEPILER( )\n", TEMP);
       genPrintVal("DEC %-9d ; ","ACC <- ACC - 1\n", 0);
       genPrintVal("JUMG %-8d ; ","JUMP 3 lignes en dessous si >= est vrai \n", LEN +4);
       genPrintVal("LOAD #%-7d ; ", "ACC <- 0 car >= est faux \n", 0);
@@ -119,24 +200,24 @@ void codegenOP(ast* p){
       genPrintVal("LOAD #%-7d ; ", "(FIN OP >=) // ACC <- 1 car >= est vrai\n", 1);
     break;
     case OP_SSUP:
-      DEPILER();
-      genPrintVal("SUB %-9d ; ","(DEBUT OP >) // ACC <- ACC - DEPILER( )\n", PILE);
+      DEPILER("");
+      genPrintVal("SUB %-9d ; ","(DEBUT OP >) // ACC <- ACC - DEPILER( )\n", TEMP);
       genPrintVal("JUMG %-8d ; ","JUMP 3 lignes en dessous si > est vrai \n", LEN +4);
       genPrintVal("LOAD #%-7d ; ", "ACC <- 0 car > est faux \n", 0);
       genPrintVal("JUMP %-8d ; ","(FIN OP >) // JUMP 2 lignes en dessous\n", LEN +3);
       genPrintVal("LOAD #%-7d ; ", "(FIN OP >) // ACC <- 1 car >  est vrai\n", 1);
     break;
     case OP_EGAL:
-      DEPILER();
-      genPrintVal("SUB %-9d ; ","(DEBUT OP =) // ACC <- ACC - DEPILER( )\n", PILE);
+      DEPILER("");
+      genPrintVal("SUB %-9d ; ","(DEBUT OP =) // ACC <- ACC - DEPILER( )\n", TEMP);
       genPrintVal("JUMZ %-8d ; ","JUMP 3 lignes en dessous si = est vrai \n", LEN +4);
       genPrintVal("LOAD #%-7d ; ", "ACC <- 0 car = est faux \n", 0);
       genPrintVal("JUMP %-8d ; ","(FIN OP =) // JUMP 2 lignes en dessous\n", LEN +3);
       genPrintVal("LOAD #%-7d ; ", "(FIN OP =) // ACC <- 1 car = est vrai\n", 1);
     break;
     case OP_DIFF:
-      DEPILER();
-      genPrintVal("SUB %-9d ; ","(DEBUT OP !=) // ACC <- ACC - DEPILER( )\n", PILE);
+      DEPILER("");
+      genPrintVal("SUB %-9d ; ","(DEBUT OP !=) // ACC <- ACC - DEPILER( )\n", TEMP);
       genPrintVal("JUMZ %-8d ; ","JUMP 3 lignes en dessous si != est faux \n", LEN +4);
       genPrintVal("LOAD #%-7d ; ", "ACC <- 1 car != est vrai \n", 1);
       genPrintVal("JUMP %-8d ; ","(FIN OP !=) // JUMP 2 lignes en dessous\n", LEN +3);
@@ -146,16 +227,16 @@ void codegenOP(ast* p){
       genPrintVal("JUMZ %-8d ; ","(DEBUT OP OU) // JUMP 3 lignes en dessous si GAUCHE OU est vrai \n", LEN +4);
       genPrintVal("LOAD #%-7d ; ", "ACC <- 1 car OU est vrai \n", 1);
       genPrintVal("JUMP %-8d ; ","(FIN OP OU) // JUMP 5 lignes en dessous\n", LEN +6);
-      DEPILER();
-      genPrintVal("LOAD %-8d ; ", "ACC <- ACC - DEPILER( )\n", PILE);
+      DEPILER("");
+      genPrintVal("LOAD %-8d ; ", "ACC <- ACC - DEPILER( )\n", TEMP);
       genPrintVal("JUMZ %-8d ; ","JUMP 2 lignes en dessous si OU est faux \n", LEN +3);
       genPrintVal("JUMP %-8d ; ","JUMP 4 lignes au dessus si OU DROITE est vrai\n", LEN -3);
       genPrintVal("LOAD #%-7d ; ", "(FIN OP OU) // ACC <- 0 car OU est faux \n", 0);
     break;
     case OP_ET:
       genPrintVal("JUMZ %-8d ; ","(DEBUT OP ET) // JUMP 5 lignes en dessous si GAUCHE ET est faux \n", LEN +6);
-      DEPILER();
-      genPrintVal("LOAD %-8d ; ", "ACC <- ACC - DEPILER( )\n", PILE);
+      DEPILER("");
+      genPrintVal("LOAD %-8d ; ", "ACC <- ACC - DEPILER( )\n", TEMP);
       genPrintVal("JUMZ %-8d ; ","JUMP 3 lignes en dessous si ET est faux \n", LEN +4);
       genPrintVal("LOAD #%-7d ; ", "ACC <- 1 car ET est vrai \n", 1);
       genPrintVal("JUMP %-8d ; ","(FIN OP ET) // JUMP 2 lignes au dessous\n", LEN -3);
@@ -169,21 +250,56 @@ void codegenOP(ast* p){
 }
 
 void codegenDECLA(ast* p){
-  //TODO: + propre
-  //var locale seulement
-  symbole * s = RechercherSymb(TABLE_SYMBOLES, p->val->decl.id, TS_ID, LOCAL );
-  //codegenAFFECT(p->val->decl.exp);
+
+  symbole * s = RechercherSymb(TABLE_SYMBOLES, p->val->affect.id, TS_DECLA);
   char comment[64];
-  sprintf(comment, "init %s sur l'adresse %d <- ACC\n", p->val->id, VARIABLES + s->adr);
-  genPrintVal("STORE %-7d ; ", comment, VARIABLES + s->adr );
+
+  if (strcmp(CONTEXTE, "GLOBAL") == 0){
+    sprintf(comment, "(DEBUT DECLA) // ACC <- adresse GLOBAL\n");
+    genPrintVal("LOAD %-8d ; ", comment, GLOBAL );
+  }
+  else{
+    sprintf(comment, "(DEBUT DECLA) // ACC <- adresse LOCAL\n");
+    genPrintVal("LOAD %-8d ; ", comment, LOCAL );
+  }
+  sprintf(comment, "ACC + position relative de  %s\n",s->id);
+  genPrintVal("ADD #%-8d ; ", comment, s->adr );
+
+  sprintf(comment, "stocke l'adresse de %s dans ADR_AFFECT\n",s->id);
+  genPrintVal("STORE %-7d ; ", comment, ADR_AFFECT );
+
+  codegen(p->val->affect.exp);//calcul de l'expression a affecter (le resultat sera dans ACC)
+
+  sprintf(comment, "(FIN DECLA) // %s <- ACC\n",s->id);
+  genPrintVal("STORE @%-6d ; ", comment, ADR_AFFECT );
+  NB_VARIABLES++;
+
 }
 
 void codegenAFFECT(ast* p){
-  symbole * s = RechercherSymb(TABLE_SYMBOLES, p->val->affect.id, TS_ID, LOCAL );
-  codegen(p->val->affect.exp);
+  
+  symbole * s = RechercherSymb(TABLE_SYMBOLES, p->val->affect.id, TS_AFFECT);
   char comment[64];
-  sprintf(comment, "%s <- ACC\n", p->val->id);
-  genPrintVal("STORE %-7d ; ", comment, VARIABLES + s->adr );
+
+  if (strcmp(CONTEXTE, "GLOBAL") == 0){
+    sprintf(comment, "(DEBUT AFFECT) // ACC <- adresse GLOBAL\n");
+    genPrintVal("LOAD %-8d ; ", comment, GLOBAL );
+  }
+  else{
+    sprintf(comment, "(DEBUT AFFECT) // ACC <- adresse LOCAL\n");
+    genPrintVal("LOAD %-8d ; ", comment, LOCAL );
+  }
+  sprintf(comment, "ACC - position relative de  %s\n",s->id);
+  genPrintVal("ADD #%-8d ; ", comment, s->adr );
+
+  sprintf(comment, "stocke l'adresse de %s dans ADR_AFFECT\n",s->id);
+  genPrintVal("STORE %-7d ; ", comment, ADR_AFFECT );
+
+  codegen(p->val->affect.exp);//calcul de l'expression a affecter (le resultat sera dans ACC)
+
+  sprintf(comment, "(FIN AFFECT) // %s <- ACC\n",s->id);
+  genPrintVal("STORE @%-6d ; ", comment, ADR_AFFECT );
+
 }
 
 void codegenINST(ast* p){
@@ -205,8 +321,6 @@ void codegenFIN(){
   LEN++;
   fprintf(exefile, "STOP\n" );
 }
-
-void EMPILER()
 
 void genPrintVal(char* line, char* comment, int val){
   LEN++;

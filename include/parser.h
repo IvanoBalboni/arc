@@ -55,27 +55,29 @@ extern int yydebug;
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
     MAIN = 258,                    /* MAIN  */
-    LIRE = 259,                    /* LIRE  */
-    RETOURNE = 260,                /* RETOURNE  */
-    VAR = 261,                     /* VAR  */
-    DEBUT = 262,                   /* DEBUT  */
-    FIN = 263,                     /* FIN  */
-    SEP = 264,                     /* SEP  */
-    AFFECT = 265,                  /* AFFECT  */
-    TQ = 266,                      /* TQ  */
-    FAIRE = 267,                   /* FAIRE  */
-    FTQ = 268,                     /* FTQ  */
-    SI = 269,                      /* SI  */
-    SINON = 270,                   /* SINON  */
-    FSI = 271,                     /* FSI  */
-    NB = 272,                      /* NB  */
-    ID = 273,                      /* ID  */
-    OU = 274,                      /* OU  */
-    ET = 275,                      /* ET  */
-    EGAL = 276,                    /* EGAL  */
-    DIFF = 277,                    /* DIFF  */
-    INF = 278,                     /* INF  */
-    SUP = 279                      /* SUP  */
+    ALGO = 259,                    /* ALGO  */
+    LIRE = 260,                    /* LIRE  */
+    ECRIRE = 261,                  /* ECRIRE  */
+    RETOURNE = 262,                /* RETOURNE  */
+    VAR = 263,                     /* VAR  */
+    DEBUT = 264,                   /* DEBUT  */
+    FIN = 265,                     /* FIN  */
+    SEP = 266,                     /* SEP  */
+    AFFECT = 267,                  /* AFFECT  */
+    TQ = 268,                      /* TQ  */
+    FAIRE = 269,                   /* FAIRE  */
+    FTQ = 270,                     /* FTQ  */
+    SI = 271,                      /* SI  */
+    SINON = 272,                   /* SINON  */
+    FSI = 273,                     /* FSI  */
+    NB = 274,                      /* NB  */
+    ID = 275,                      /* ID  */
+    OU = 276,                      /* OU  */
+    ET = 277,                      /* ET  */
+    EGAL = 278,                    /* EGAL  */
+    DIFF = 279,                    /* DIFF  */
+    INF = 280,                     /* INF  */
+    SUP = 281                      /* SUP  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -91,7 +93,7 @@ union YYSTYPE
   struct ast* tree;
  
 
-#line 95 "src/parser.h"
+#line 97 "src/parser.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

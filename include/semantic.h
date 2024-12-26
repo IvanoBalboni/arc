@@ -9,6 +9,7 @@
 #include "ts.h"
 
 extern table_symb * TABLE_SYMBOLES;
+extern char         CONTEXTE[32];
 
 void semantic(ast * p);
 

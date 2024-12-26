@@ -5,5 +5,5 @@ DEBUT
 a <- 10;
 b <- LIRE();
 a <- a * (b + 5);
-RETOURNE a;
+ECRIRE a;
 FIN

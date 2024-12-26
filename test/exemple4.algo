@@ -5,6 +5,10 @@ VAR c;
 DEBUT
 a <- LIRE();
 b <- LIRE();
-c <- a ET b;
+c <- 0;
+TQ a > b FAIRE
+  a <- a + 1;
+  c <- c + 1;
+FTQ;
 RETOURNE c;
 FIN

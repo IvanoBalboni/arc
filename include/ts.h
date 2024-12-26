@@ -8,36 +8,48 @@
 #include "ast.h"
 
 typedef enum{
-  TS_ID  = 64, TS_L_ID = 65, TS_DECLA = 66, TS_AFFECT = 67,
-  TS_FCT = 68
+  TS_ID  = 64, TS_DECLA  = 65, TS_AFFECT  = 66 ,
+  TS_LID = 67, TS_LID_DECLA = 68, TS_LID_AFFECT = 69 ,
+  TS_FCT = 70, TS_FCT_DECLA = 71,
+  TS_FIN = 72
 }Type;
 
-typedef enum{//TODO: devient string pour gerer contexte fct?
-  GLOBAL = 0, LOCAL = 1
-}contexte;
 
 typedef struct symbole{
   char     id[32];
   int      adr;
   Type     type;
-  contexte ctxt;
 } symbole;
 
 
-typedef struct table_symb{
+typedef struct contexte{
   symbole*            symb;
-  struct table_symb * suiv;
+  struct contexte *   suiv;
+}contexte;
+
+typedef struct table_symb{
+  char                 contexte[32];
+  contexte *           table_ctxt;
+  struct table_symb *  suiv;
 }table_symb;
 
-//LIFO
+
+symbole * CreerSymb(char* id, int adr, Type type);
+//FIFO
+contexte * contexteAddt(symbole * s);
+//FIFO
 table_symb * TableSymbInit();
 
+void AjouterCTXT(table_symb * ts, char* ctxt);
+
 void AjouterSymb(table_symb * ts, symbole * symb);
-symbole * CreerSymb(char* id, int adr, Type type, contexte ctxt);
-//peut etre besoin de demander le ctxt + tard
-symbole * RechercherSymb(table_symb * ts, char * id, Type type, contexte ctxt);
+
+symbole * RechercherSymb(table_symb * ts, char * id, Type type);
+
+void setCONTEXTE(char* ctxt);
 
 void printTS(table_symb * ts);
+void printCONTEXTE(contexte * tc);
 void ErrorTs(const char * errmsg);
 
 #endif

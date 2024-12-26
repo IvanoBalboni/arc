@@ -41,11 +41,13 @@ ID              [a-zA-Z_][a-zA-Z_0-9]*
 "MAIN()"        { return MAIN;}
 "ALGO"          { return ALGO;}
 "LIRE()"        { return LIRE;}
+"ECRIRE"        { return ECRIRE;}
 "RETOURNE"      { return RETOURNE;}
 "VAR"           { return VAR;}
 "DEBUT"         { return DEBUT;}
 "FIN"           { return FIN;}
 ";"             { return SEP;}
+"<-"            { return AFFECT;}
 "SI"            { return SI;}
 "SINON"         { return SINON;}
 "FSI"           { return FSI;}
@@ -54,12 +56,13 @@ ID              [a-zA-Z_][a-zA-Z_0-9]*
 "FTQ"           { return FTQ;}
 "OU"            { return OU;}
 "ET"            { return ET;}
-"<-"            { return AFFECT;}
 "<="            { return INF;}
 ">="            { return SUP;}
 "!="            { return DIFF;}
 "="             { return EGAL;}
-[-+*/%()<>,\[\]]{ return *yytext;}
+"["             { return '[';}
+"]"             { return ']';}
+[-+*/%()<>,]    { return *yytext;}
 {ID}            { strcpy(yylval.id, yytext); return ID;}
 .               {
                   sprintf(errmsg,charerr, yytext[0]);

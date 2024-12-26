@@ -5,26 +5,37 @@
 #include "ts.h"
 
 
-extern FILE *    exefile;
+extern FILE *       exefile;
 extern table_symb * TABLE_SYMBOLES;
+extern char         CONTEXTE[32];
+extern char         CHERCHE_SYMB_GLOBAL;
+
 
 enum{
-    TEMP = 1, RET = 2, PILE = 3, PILE_APPEL = 4
+    TEMP = 1, APPEL_FCT = 2, PILE = 3, LOCAL = 4, GLOBAL = 5, ADR_AFFECT = 6
 };
 
-#define DEBUT_GLOBAL 9
 
-typedef enum CONTEXT{GLOBAL_VAR = 128, LOCAL_VAR = 129, FUNCTION = 130}CONTEXT;
 //
-#define EMPILER() PILE++    \
+#define EMPILER(adr, comment) genPrintVal("LOAD %-8d ; ", comment, adr);    \
+  genPrintVal("STORE @%-6d ; ", "EMPILER\n", PILE);    \
+  genPrintVal("INC %-9d ; ", "FIN EMPILER\n", PILE);  \
 
-#define DEPILER() PILE--    \
+#define DEPILER(comment) genPrintVal("DEC %-9d ; ", "DEPILER\n", PILE);  \
+  genPrintVal("LOAD @%-7d ; ", comment, PILE);    \
 
+#define STOCKER(comment) genPrintVal("STORE %-7d ; ", comment, TEMP);
 
-int chercher(table_symb ts, CONTEXT);
 
 //utilise la TS pour initialiser PILE apres les var globales & fonctions
 void codegenInit();//jump @main
+
+void codegenInitMain();
+
+void codegenInitCONTEXTE();
+
+void codegenCHGT_PILE(int sortie_contexte);
+
 //ecrit dans le fichier exefile les instructions machine RAM
 void codegen(ast* p);
 
@@ -39,7 +50,5 @@ void codegenRETOURNE(ast* p);
 void codegenFIN();
 
 //TODO empiler
-void EMPILER(char* comment);
-void DEPILER(char* comment);
 void genPrintVal(char* line, char* comment, int val);
 #endif
