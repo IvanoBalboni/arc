@@ -59,7 +59,7 @@ void AjouterSymb(table_symb * ts, symbole * symb){
   while (suiv != NULL) {
     if (strcmp(suiv->contexte, CONTEXTE) == 0){
       if ( suiv->table_ctxt == NULL){
-        suiv->table_ctxt = contexteAdd(symb);printf("apres ajout\n" );
+        suiv->table_ctxt = contexteAdd(symb);
         return;
       }
       ctxt_suiv = suiv->table_ctxt;
@@ -118,7 +118,7 @@ symbole * RechercherSymb(table_symb * ts, char * id, Type type){
   }
 
   //id == ts->symb.id
-  if (strcmp(CONTEXTE, "GLOBAL") != 0)
+  if (strcmp(ts->contexte, "GLOBAL") != 0)
     ErrorTs("contexte GLOBAL non existant");
   //return NULL;
 

@@ -45,7 +45,16 @@ void codegenOP(ast* p);
 void codegenDECLA(ast* p);
 void codegenAFFECT(ast* p);
 void codegenINST(ast* p);
+void codegenSI(ast* p);
+void codegenTQ(ast* p);
+void codegenFCT(ast* p);
+void codegenAPPEL_FCT(ast* p);
+void codegenLIST(ast* p);
+void codegenIDL(ast* p);
+void codegenDECL_IDL(ast* p);
+void codegenAFF_IDL(ast* p);
 void codegenLIRE(ast* p);
+void codegenECRIRE(ast* p);
 void codegenRETOURNE(ast* p);
 void codegenFIN();
 

@@ -1,0 +1,94 @@
+LOAD #8       ; init l'adresse de la pile
+STORE 3       ; PILE <- ACC
+JUMP 3        ; JUMP a la 1ere instruction de MAIN()
+LOAD 3        ; (DEBUT MAIN) // ACC <- PILE
+STORE 4       ; LOCAL <- ACC
+LOAD 4        ; (DEBUT DECLA) // ACC <- adresse LOCAL
+ADD #0        ; ACC + position relative de  a
+STORE 6       ; stocke l'adresse de a
+STORE @6      ; (FIN DECLA) // a <- ACC
+LOAD 4        ; (DEBUT DECLA) // ACC <- adresse LOCAL
+ADD #1        ; ACC + position relative de  b
+STORE 6       ; stocke l'adresse de b
+STORE @6      ; (FIN DECLA) // b <- ACC
+LOAD 4        ; (DEBUT DECLA) // ACC <- adresse LOCAL
+ADD #2        ; ACC + position relative de  c
+STORE 6       ; stocke l'adresse de c
+STORE @6      ; (FIN DECLA) // c <- ACC
+LOAD #3       ; ACC <- NB Variabls declarees
+ADD 3         ;  ACC <- ACC + ADRESSE PILE
+STORE 3       ; Avance la PILE du nombre de DECL
+LOAD 4        ; (DEBUT AFFECT) // ACC <- adresse LOCAL
+ADD #0        ; ACC - position relative de  a
+STORE 6       ; stocke l'adresse de a
+READ          ; ACC <- ENTREE[I++]
+STORE @6      ; (FIN AFFECT) // a <- ACC
+LOAD 4        ; (DEBUT AFFECT) // ACC <- adresse LOCAL
+ADD #1        ; ACC - position relative de  b
+STORE 6       ; stocke l'adresse de b
+READ          ; ACC <- ENTREE[I++]
+STORE @6      ; (FIN AFFECT) // b <- ACC
+LOAD 4        ; (DEBUT AFFECT) // ACC <- adresse LOCAL
+ADD #2        ; ACC - position relative de  c
+STORE 6       ; stocke l'adresse de c
+LOAD #0       ; ACC <- 0
+STORE @6      ; (FIN AFFECT) // c <- ACC
+LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
+ADD #0        ; ACC + position relative de  a
+STORE 1       ; TEMP <- ACC (ID)
+LOAD @1       ; ACC <- a
+LOAD 0        ; (DEBUT OP) // EMPILE EXP1 de l'op : EXP1 OP EXP2
+STORE @3      ; EMPILER
+INC 3         ; FIN EMPILER
+LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
+ADD #1        ; ACC + position relative de  b
+STORE 1       ; TEMP <- ACC (ID)
+LOAD @1       ; ACC <- b
+STORE 1       ; TEMP <- ACC (EXP2)
+DEC 3         ; DEPILER
+LOAD @3       ; EXP1
+SUB 1         ; (DEBUT OP <) // ACC <- ACC (EXP1) - TEMP (EXP2)
+JUML 53       ; JUMP 3 lignes en dessous si <= est vrai 
+LOAD #0       ; ACC <- 0 car < est faux 
+JUMP 54       ; (FIN OP <=) // JUMP 2 lignes en dessous
+LOAD #1       ; (FIN OP <=) // ACC <- 1 car < est vrai
+JUMZ 88       ; (TQ) // SI EXP TQ = 0 -> FTQ
+LOAD 4        ; (DEBUT AFFECT) // ACC <- adresse LOCAL
+ADD #0        ; ACC - position relative de  a
+STORE 6       ; stocke l'adresse de a
+LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
+ADD #0        ; ACC + position relative de  a
+STORE 1       ; TEMP <- ACC (ID)
+LOAD @1       ; ACC <- a
+LOAD 0        ; (DEBUT OP) // EMPILE EXP1 de l'op : EXP1 OP EXP2
+STORE @3      ; EMPILER
+INC 3         ; FIN EMPILER
+LOAD #1       ; ACC <- 1
+STORE 1       ; TEMP <- ACC (EXP2)
+DEC 3         ; DEPILER
+LOAD @3       ; EXP1
+ADD 1         ; (FIN OP +) // ACC <- ACC (EXP1) + TEMP (EXP2)
+STORE @6      ; (FIN AFFECT) // a <- ACC
+LOAD 4        ; (DEBUT AFFECT) // ACC <- adresse LOCAL
+ADD #2        ; ACC - position relative de  c
+STORE 6       ; stocke l'adresse de c
+LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
+ADD #2        ; ACC + position relative de  c
+STORE 1       ; TEMP <- ACC (ID)
+LOAD @1       ; ACC <- c
+LOAD 0        ; (DEBUT OP) // EMPILE EXP1 de l'op : EXP1 OP EXP2
+STORE @3      ; EMPILER
+INC 3         ; FIN EMPILER
+LOAD #1       ; ACC <- 1
+STORE 1       ; TEMP <- ACC (EXP2)
+DEC 3         ; DEPILER
+LOAD @3       ; EXP1
+ADD 1         ; (FIN OP +) // ACC <- ACC (EXP1) + TEMP (EXP2)
+STORE @6      ; (FIN AFFECT) // c <- ACC
+JUMP 35       ; (TQ) // JUMP DEBUT TQ
+LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
+ADD #2        ; ACC + position relative de  c
+STORE 1       ; TEMP <- ACC (ID)
+LOAD @1       ; ACC <- c
+WRITE         ; SORTIE[I++] <- ACC
+STOP

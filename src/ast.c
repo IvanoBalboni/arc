@@ -123,7 +123,11 @@ ast * CreerFeuilleDECLA(char* id, ast* exp){
   p->val = n;
 
   strcpy(p->val->decl.id, id);
-  p->val->decl.exp = exp;
+  if(exp == NULL)
+    return p;
+    
+  ast * aff = CreerFeuilleAFFECT(id, exp);
+  p->val->decl.exp = aff;
 
   return p;
 }

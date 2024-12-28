@@ -12,6 +12,7 @@ extern table_symb * TABLE_SYMBOLES;
 extern char         CONTEXTE[32];
 
 void semantic(ast * p);
+int lenOP(typeOP op, int exp1, int exp2);
 
 void ErrorSemantic(const char * errmsg);
 #endif

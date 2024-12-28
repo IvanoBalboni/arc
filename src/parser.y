@@ -96,21 +96,21 @@ DECLARATIONS: %empty            { $$ = NULL;}
 ;
 
 
-INSTRUCTIONS: INST SEP          { $$ = CreerNoeudINSTRUCT($1, NULL); }
-| INST SEP INSTRUCTIONS         { $$ = CreerNoeudINSTRUCT($1, $3);   }
+INSTRUCTIONS: INST              { $$ = CreerNoeudINSTRUCT($1, NULL); }
+| INST INSTRUCTIONS             { $$ = CreerNoeudINSTRUCT($1, $2);   }
 ;
 
-INST: EXP                       { $$ = $1; }
-| ECRIRE EXP                    { $$ = CreerFeuilleECRIRE($2); }
-| RETOURNE EXP                  { $$ = CreerFeuilleRETOURNE($2); }
-| VAR DECLA                     { $$ = $2; }
-| AFFECTATION                   { $$ = $1; }
+INST: EXP SEP                   { $$ = $1; }
+| ECRIRE EXP SEP                { $$ = CreerFeuilleECRIRE($2); }
+| RETOURNE EXP SEP              { $$ = CreerFeuilleRETOURNE($2); }
+| VAR DECLA SEP                 { $$ = $2; }
+| AFFECTATION SEP               { $$ = $1; }
 | SI EXP FAIRE INSTRUCTIONS FSI { $$ = CreerNoeudSI($2, $4, NULL);}
 | SI EXP FAIRE INSTRUCTIONS SINON INSTRUCTIONS FSI { $$ = CreerNoeudSI($2, $4, $6);}
 | TQ EXP FAIRE INSTRUCTIONS FTQ {$$ = CreerNoeudTQ($2, $4);}
 ;
 
-DECLA: ID AFFECT EXP            {$$ = CreerFeuilleDECLA(yyval.id, $3); /*TODO: marche pas*/ }
+DECLA: ID AFFECT EXP            {$$ = CreerFeuilleDECLA(yyval.id, $3); }
 | ID '[' NB ']'                 {$$ = CreerFeuilleDECLALISTE(yyval.id, yyval.nb);}
 | ID                            {$$ = CreerFeuilleDECLA(yyval.id, NULL);}
 ;
@@ -171,9 +171,8 @@ int main( int argc, char * argv[] ) {
 
   TABLE_SYMBOLES = TableSymbInit();
 
-  printf("hey\n" );
-
   setCONTEXTE("MAIN");
+  printTS(TABLE_SYMBOLES);
   printf("pb0\n");
 
 

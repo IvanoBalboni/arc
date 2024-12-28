@@ -1,9 +1,10 @@
 MAIN()
 VAR a;
 VAR b;
+VAR c <- 0;
 DEBUT
 a <- 10;
 b <- LIRE();
-a <- a * (b + 5);
-ECRIRE a;
+c <- a * (b + 5);
+ECRIRE c;
 FIN

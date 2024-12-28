@@ -29,6 +29,7 @@ void codegenInitMAIN(){
   for (size_t i = 0; i < 2; i++){//passe la ligne courante et la suivante
     fscanf(exefile,"%[^\n]",temp);
     fscanf(exefile,"%c",temp);
+    temp[0] = '\0';
   }
   
   if (fseek(exefile, 5, SEEK_CUR) != 0)
@@ -64,36 +65,56 @@ void codegen(ast* p){
       codegenInitCONTEXTE();
   }
 
-  switch(p->type){
-  case AST_LIRE:
-    codegenLIRE(p);
-  break;
-  case AST_RETOURNE:
-    codegenRETOURNE(p);
-  break;
-  case AST_NB:
-    codegenNB(p);
-  break;
-  case AST_ID:
-    codegenID(p);
-  break;
-  case AST_OP:
-    codegenOP(p);
-  break;
-  case AST_AFF:
-    codegenAFFECT(p);
-  break;
-  case AST_DECL:
-    codegenDECLA(p);
-  break;
-  case AST_INST:
-    codegenINST(p);
-    if(p->val->inst.suiv != NULL)
-      codegen(p->val->inst.suiv);
-  break;
-  default:
-    fprintf(stderr,"[Erreur] type <%d>: %s non reconnu\n",p->type,p->type_str);
-  break;
+    switch(p->type){
+    case AST_LIRE:
+      codegenLIRE(p);
+    break;
+    case AST_ECRIRE:
+      codegenECRIRE(p);
+    break;
+    case AST_RETOURNE:
+      codegenRETOURNE(p);
+    break;
+    case AST_NB:
+      codegenNB(p);
+    break;
+    case AST_ID:
+      codegenID(p);
+    break;
+    case AST_OP:
+      codegenOP(p);
+    break;
+    case AST_AFF:
+      codegenAFFECT(p);
+    break;
+    case AST_DECL:
+      codegenDECLA(p);
+    break;
+    case AST_INST:
+      codegenINST(p);
+      if(p->val->inst.suiv != NULL)
+        codegen(p->val->inst.suiv);
+    break;
+    case AST_SI:
+    break;
+    case AST_TQ:
+      codegenTQ(p);
+    break;
+    case AST_FCT:
+    break;
+    case AST_APPEL_FCT:
+    break;
+    case AST_LIST:
+    break;
+    case AST_IDL:
+    break;
+    case AST_DECL_IDL:
+    break;
+    case AST_AFF_IDL:
+    break;
+    default:
+      fprintf(stderr,"[Erreur] type <%d>: %s non reconnu\n",p->type,p->type_str);
+    break;
   }
 
 }
@@ -135,112 +156,90 @@ void codegenOP(ast* p){
    * on l'empile et on génère la partie gauche puis on execute l'operation
    * et stocke le resultat dans l'acc.
   */
-  codegen(p->val->op.val[1]);
-  EMPILER(0,"(DEBUT OP) // EMPILE EXP2 de l'op : EXP1 OP EXP2\n");
+  codegen(p->val->op.val[0]);
+  EMPILER(0,"(DEBUT OP) // EMPILE EXP1 de l'op : EXP1 OP EXP2\n");
   //TODO: temp
   //TODO: STORE 1
-  codegen(p->val->op.val[0]);
-  EMPILER(0,"EMPILE EXP1 de l'op : EXP1 OP EXP2\n");
+  codegen(p->val->op.val[1]);
+  STOCKER("TEMP <- ACC (EXP2)\n");
+  DEPILER("EXP1\n");
 
   switch (p->val->op.type) {
     case OP_PLUS:
-      DEPILER("EXP2\n");
-      STOCKER("TEMP <- ACC (EXP2)\n");
-      DEPILER("EXP1\n");
       genPrintVal("ADD %-9d ; ","(FIN OP +) // ACC <- ACC (EXP1) + TEMP (EXP2)\n", TEMP);
     break;
     case OP_MOINS:
-      DEPILER("EXP2\n");
-      STOCKER("TEMP <- ACC (EXP2)\n");
-      DEPILER("EXP1\n");
       genPrintVal("SUB %-9d ; ","(FIN OP -) // ACC <- ACC (EXP1) - TEMP (EXP2)\n", TEMP);
     break;
     case OP_MULT:
-      DEPILER("EXP2\n");
-      STOCKER("TEMP <- ACC (EXP2)\n");
-      DEPILER("EXP1\n");
       genPrintVal("MUL %-9d ; ","(FIN OP *) // ACC <- ACC (EXP1) * TEMP (EXP2)\n", TEMP);
     break;
     case OP_DIV:
-      DEPILER("EXP2\n");
-      STOCKER("TEMP <- ACC (EXP2)\n");
-      DEPILER("EXP1\n");
       genPrintVal("DIV %-9d ; ","(FIN OP /) // ACC <- ACC (EXP1) / TEMP (EXP2)\n", TEMP);
     break;
     case OP_MOD:
-      DEPILER("EXP2\n");
-      STOCKER("TEMP <- ACC (EXP2)\n");
-      DEPILER("EXP1\n");
-      genPrintVal("MOD %-9d ; ","(FIN OP %) // ACC <- ACC (EXP1) % TEMP (EXP2)\n", TEMP);
+      genPrintVal("MOD %-9d ; ","(FIN OP %%) // ACC <- ACC (EXP1) %% TEMP (EXP2)\n", TEMP);
     break;
-    case OP_INF://TODO:
-      DEPILER("");
-      genPrintVal("SUB %-9d ; ","(DEBUT OP <=) // ACC <- ACC - DEPILER( )\n", TEMP);
+    case OP_INF:
+      genPrintVal("SUB %-9d ; ","(DEBUT OP <=) // ACC <- ACC (EXP1) - TEMP (EXP2)\n", TEMP);
       genPrintVal("DEC %-9d ; ","ACC <- ACC - 1\n", 0);
-      genPrintVal("JUML %-8d ; ","JUMP 3 lignes en dessous si <= est vrai \n", LEN +4);
+      genPrintVal("JUML %-8d ; ","JUMP 3 lignes en dessous si <= est vrai \n", LEN +3);
       genPrintVal("LOAD #%-7d ; ", "ACC <- 0 car <= est faux \n", 0);
-      genPrintVal("JUMP %-8d ; ","(FIN OP <=) // JUMP 2 lignes en dessous\n", LEN +3);
+      genPrintVal("JUMP %-8d ; ","(FIN OP <=) // JUMP 2 lignes en dessous\n", LEN +2);
       genPrintVal("LOAD #%-7d ; ", "(FIN OP <=) // ACC <- 1 car <= est vrai\n", 1);
     break;
     case OP_SINF:
-      DEPILER("");
-      genPrintVal("SUB %-9d ; ","(DEBUT OP <) // ACC <- ACC - DEPILER( )\n", TEMP);
-      genPrintVal("JUML %-8d ; ","JUMP 3 lignes en dessous si <= est vrai \n", LEN +4);
+      genPrintVal("SUB %-9d ; ","(DEBUT OP <) // ACC <- ACC (EXP1) - TEMP (EXP2)\n", TEMP);
+      genPrintVal("JUML %-8d ; ","JUMP 3 lignes en dessous si <= est vrai \n", LEN +3);
       genPrintVal("LOAD #%-7d ; ", "ACC <- 0 car < est faux \n", 0);
-      genPrintVal("JUMP %-8d ; ","(FIN OP <=) // JUMP 2 lignes en dessous\n", LEN +3);
+      genPrintVal("JUMP %-8d ; ","(FIN OP <=) // JUMP 2 lignes en dessous\n", LEN +2);
       genPrintVal("LOAD #%-7d ; ", "(FIN OP <=) // ACC <- 1 car < est vrai\n", 1);
     break;
     case OP_SUP:
-      DEPILER("");
-      genPrintVal("SUB %-9d ; ","(DEBUT OP >=) // ACC <- ACC - DEPILER( )\n", TEMP);
+      genPrintVal("SUB %-9d ; ","(DEBUT OP >=) // ACC <- ACC (EXP1) - TEMP (EXP2)\n", TEMP);
       genPrintVal("DEC %-9d ; ","ACC <- ACC - 1\n", 0);
-      genPrintVal("JUMG %-8d ; ","JUMP 3 lignes en dessous si >= est vrai \n", LEN +4);
+      genPrintVal("JUMG %-8d ; ","JUMP 3 lignes en dessous si >= est vrai \n", LEN +3);
       genPrintVal("LOAD #%-7d ; ", "ACC <- 0 car >= est faux \n", 0);
-      genPrintVal("JUMP %-8d ; ","(FIN OP >=) // JUMP 2 lignes en dessous\n", LEN +3);
+      genPrintVal("JUMP %-8d ; ","(FIN OP >=) // JUMP 2 lignes en dessous\n", LEN +2);
       genPrintVal("LOAD #%-7d ; ", "(FIN OP >=) // ACC <- 1 car >= est vrai\n", 1);
     break;
     case OP_SSUP:
-      DEPILER("");
-      genPrintVal("SUB %-9d ; ","(DEBUT OP >) // ACC <- ACC - DEPILER( )\n", TEMP);
+      genPrintVal("SUB %-9d ; ","(DEBUT OP >) // ACC <- ACC (EXP1) - TEMP (EXP2)\n", TEMP);
       genPrintVal("JUMG %-8d ; ","JUMP 3 lignes en dessous si > est vrai \n", LEN +4);
       genPrintVal("LOAD #%-7d ; ", "ACC <- 0 car > est faux \n", 0);
-      genPrintVal("JUMP %-8d ; ","(FIN OP >) // JUMP 2 lignes en dessous\n", LEN +3);
+      genPrintVal("JUMP %-8d ; ","(FIN OP >) // JUMP 2 lignes en dessous\n", LEN +2);
       genPrintVal("LOAD #%-7d ; ", "(FIN OP >) // ACC <- 1 car >  est vrai\n", 1);
     break;
     case OP_EGAL:
-      DEPILER("");
-      genPrintVal("SUB %-9d ; ","(DEBUT OP =) // ACC <- ACC - DEPILER( )\n", TEMP);
-      genPrintVal("JUMZ %-8d ; ","JUMP 3 lignes en dessous si = est vrai \n", LEN +4);
+      genPrintVal("SUB %-9d ; ","(DEBUT OP =) // ACC <- ACC <- ACC (EXP1) - TEMP (EXP2)\n", TEMP);
+      genPrintVal("JUMZ %-8d ; ","JUMP 3 lignes en dessous si = est vrai \n", LEN +3);
       genPrintVal("LOAD #%-7d ; ", "ACC <- 0 car = est faux \n", 0);
-      genPrintVal("JUMP %-8d ; ","(FIN OP =) // JUMP 2 lignes en dessous\n", LEN +3);
+      genPrintVal("JUMP %-8d ; ","(FIN OP =) // JUMP 2 lignes en dessous\n", LEN +2);
       genPrintVal("LOAD #%-7d ; ", "(FIN OP =) // ACC <- 1 car = est vrai\n", 1);
     break;
     case OP_DIFF:
-      DEPILER("");
-      genPrintVal("SUB %-9d ; ","(DEBUT OP !=) // ACC <- ACC - DEPILER( )\n", TEMP);
-      genPrintVal("JUMZ %-8d ; ","JUMP 3 lignes en dessous si != est faux \n", LEN +4);
+      genPrintVal("SUB %-9d ; ","(DEBUT OP !=) // ACC <- ACC <- ACC (EXP1) - TEMP (EXP2)\n", TEMP);
+      genPrintVal("JUMZ %-8d ; ","JUMP 3 lignes en dessous si != est faux \n", LEN +3);
       genPrintVal("LOAD #%-7d ; ", "ACC <- 1 car != est vrai \n", 1);
-      genPrintVal("JUMP %-8d ; ","(FIN OP !=) // JUMP 2 lignes en dessous\n", LEN +3);
+      genPrintVal("JUMP %-8d ; ","(FIN OP !=) // JUMP 2 lignes en dessous\n", LEN +2);
       genPrintVal("LOAD #%-7d ; ", "(FIN OP !=) // ACC <- 0 car != est faux\n", 0);
     break;
     case OP_OU:
-      genPrintVal("JUMZ %-8d ; ","(DEBUT OP OU) // JUMP 3 lignes en dessous si GAUCHE OU est vrai \n", LEN +4);
+      genPrintVal("JUMZ %-8d ; ","(DEBUT OP OU) // JUMP 3 lignes en dessous si EXP1 est faux \n", LEN +3);
       genPrintVal("LOAD #%-7d ; ", "ACC <- 1 car OU est vrai \n", 1);
-      genPrintVal("JUMP %-8d ; ","(FIN OP OU) // JUMP 5 lignes en dessous\n", LEN +6);
-      DEPILER("");
-      genPrintVal("LOAD %-8d ; ", "ACC <- ACC - DEPILER( )\n", TEMP);
-      genPrintVal("JUMZ %-8d ; ","JUMP 2 lignes en dessous si OU est faux \n", LEN +3);
-      genPrintVal("JUMP %-8d ; ","JUMP 4 lignes au dessus si OU DROITE est vrai\n", LEN -3);
+      genPrintVal("JUMP %-8d ; ","(FIN OP OU) // JUMP 5 lignes en dessous\n", LEN +5);
+      genPrintVal("LOAD %-8d ; ", "ACC <- TEMP (EXP2)\n", TEMP);
+      genPrintVal("JUMZ %-8d ; ","JUMP 2 lignes en dessous si EXP2 est faux \n", LEN +2);
+      genPrintVal("JUMP %-8d ; ","JUMP 4 lignes au dessus si EXP2 est vrai\n", LEN -3);
       genPrintVal("LOAD #%-7d ; ", "(FIN OP OU) // ACC <- 0 car OU est faux \n", 0);
     break;
     case OP_ET:
-      genPrintVal("JUMZ %-8d ; ","(DEBUT OP ET) // JUMP 5 lignes en dessous si GAUCHE ET est faux \n", LEN +6);
-      DEPILER("");
-      genPrintVal("LOAD %-8d ; ", "ACC <- ACC - DEPILER( )\n", TEMP);
-      genPrintVal("JUMZ %-8d ; ","JUMP 3 lignes en dessous si ET est faux \n", LEN +4);
+      genPrintVal("JUMZ %-8d ; ","(DEBUT OP ET) // JUMP 5 lignes en dessous si EXP1 est faux \n", LEN +5);
+      genPrintVal("LOAD %-8d ; ", "ACC <- TEMP (EXP2)\n", TEMP);
+      genPrintVal("JUMZ %-8d ; ","JUMP 3 lignes en dessous si EXP2 est faux \n", LEN +3);
       genPrintVal("LOAD #%-7d ; ", "ACC <- 1 car ET est vrai \n", 1);
-      genPrintVal("JUMP %-8d ; ","(FIN OP ET) // JUMP 2 lignes au dessous\n", LEN -3);
-      genPrintVal("LOAD #%-7d ; ", "(FIN OP ET) // ACC <- 0 car OU est faux \n", 0);
+      genPrintVal("JUMP %-8d ; ","(FIN OP ET) // JUMP 2 lignes au dessous\n", LEN +2);
+      genPrintVal("LOAD #%-7d ; ", "(FIN OP ET) // ACC <- 0 car ET est faux \n", 0);
     break;
     default:
       fprintf(stderr,"[Erreur] type <%d>: %s non reconnu\n",p->type,p->type_str);
@@ -265,7 +264,7 @@ void codegenDECLA(ast* p){
   sprintf(comment, "ACC + position relative de  %s\n",s->id);
   genPrintVal("ADD #%-8d ; ", comment, s->adr );
 
-  sprintf(comment, "stocke l'adresse de %s dans ADR_AFFECT\n",s->id);
+  sprintf(comment, "stocke l'adresse de %s\n",s->id);
   genPrintVal("STORE %-7d ; ", comment, ADR_AFFECT );
 
   codegen(p->val->affect.exp);//calcul de l'expression a affecter (le resultat sera dans ACC)
@@ -292,7 +291,7 @@ void codegenAFFECT(ast* p){
   sprintf(comment, "ACC - position relative de  %s\n",s->id);
   genPrintVal("ADD #%-8d ; ", comment, s->adr );
 
-  sprintf(comment, "stocke l'adresse de %s dans ADR_AFFECT\n",s->id);
+  sprintf(comment, "stocke l'adresse de %s\n",s->id);
   genPrintVal("STORE %-7d ; ", comment, ADR_AFFECT );
 
   codegen(p->val->affect.exp);//calcul de l'expression a affecter (le resultat sera dans ACC)
@@ -306,14 +305,31 @@ void codegenINST(ast* p){
   codegen(p->val->inst.val);
 }
 
+void codegenTQ(ast* p){
+  codegen(p->val->tq.exp);
+  genPrintVal("JUMZ %-8d ; ", "(TQ) // SI EXP TQ = 0 -> FTQ\n", LEN + p->val->tq.faire->codelen +2);
+  codegen(p->val->tq.faire); 
+  genPrintVal("JUMP %-8d ; ", "(TQ) // JUMP DEBUT TQ\n", LEN - p->val->tq.faire->codelen -p->val->tq.exp->codelen -1);
+}
+
+
 void codegenLIRE(ast* p){
   LEN++;
   fprintf(exefile, "READ          ; ACC <- ENTREE[I++]\n");
 }
+
+
+void codegenECRIRE(ast* p){
+  codegen(p->val->ecrire);
+  LEN++;
+  fprintf(exefile, "WRITE         ; SORTIE[I++] <- ACC\n" );
+}
+
 void codegenRETOURNE(ast* p){
+  printf("CMARCHE {PASJSIOJSD} TODO\n");
   codegen(p->val->retourne);
   LEN++;
-  fprintf(exefile, "WRITE         ; ACC <- ENTREE[I++]\n" );
+  fprintf(exefile, "WRITE         ; ACC <- SORTIE[I++]\n" );
 }
 
 

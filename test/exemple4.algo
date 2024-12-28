@@ -6,9 +6,9 @@ DEBUT
 a <- LIRE();
 b <- LIRE();
 c <- 0;
-TQ a > b FAIRE
+TQ a < b FAIRE
   a <- a + 1;
   c <- c + 1;
-FTQ;
-RETOURNE c;
+FTQ
+ECRIRE c;
 FIN

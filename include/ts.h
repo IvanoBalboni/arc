@@ -36,7 +36,7 @@ typedef struct table_symb{
 
 symbole * CreerSymb(char* id, int adr, Type type);
 //FIFO
-contexte * contexteAddt(symbole * s);
+contexte * contexteAdd(symbole * s);
 //FIFO
 table_symb * TableSymbInit();
 
