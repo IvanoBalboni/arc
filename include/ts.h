@@ -9,9 +9,10 @@
 
 typedef enum{
   TS_ID  = 64, TS_DECLA  = 65, TS_AFFECT  = 66 ,
-  TS_LID = 67, TS_LID_DECLA = 68, TS_LID_AFFECT = 69 ,
-  TS_FCT = 70, TS_FCT_DECLA = 71,
-  TS_FIN = 72
+  TS_IDL = 67, TS_IDL_DECLA = 68, TS_IDL_AFFECT = 69 ,
+  TS_FCT = 70, TS_FCT_PROTO = 71, TS_FCT_DECLA = 72,
+  TS_ADR = 73,
+  TS_FIN = 74
 }Type;
 
 
@@ -45,6 +46,7 @@ void AjouterCTXT(table_symb * ts, char* ctxt);
 void AjouterSymb(table_symb * ts, symbole * symb);
 
 symbole * RechercherSymb(table_symb * ts, char * id, Type type);
+symbole * RechercherADR(table_symb * ts, char * id);
 
 void setCONTEXTE(char* ctxt);
 

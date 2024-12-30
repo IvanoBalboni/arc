@@ -59,6 +59,21 @@ ast * CreerFeuilleID(char* id){
   return p;
 }
 
+ast * CreerFeuilleADR(char* id){
+  ast * p;
+  INIT_NOEUD(p);
+  p->type = AST_ADR;
+  strcpy(p->type_str,"ADR");
+
+  valeur* n;
+  if ((n = malloc(sizeof(variable))) == NULL)
+    ErrorAst("echec allocation mémoire");
+  
+  p->val = n;
+  strcpy(p->val->id, id);
+
+  return p;
+}
 
 ast * CreerFeuilleLIRE(){
   ast * p;
@@ -150,7 +165,7 @@ ast * CreerFeuilleAFFECT(char* id, ast* exp){
 }
 
 
-ast * CreerFeuilleDECLALISTE(char* id, int taille){
+ast * CreerFeuilleDECLA_IDL(char* id, int taille, ast * liste){
   ast * p;
   INIT_NOEUD(p);
   p->type = AST_DECL_IDL;
@@ -163,6 +178,7 @@ ast * CreerFeuilleDECLALISTE(char* id, int taille){
 
   strcpy(p->val->decl_liste.id, id);
   p->val->decl_liste.taille = taille;
+  p->val->decl_liste.liste = liste;
 
   return p;
 }
@@ -174,10 +190,15 @@ ast * CreerNoeudLISTE(ast * exp, ast * suiv){
   strcpy(p->type_str,"LISTE");
 
   valeur* n;
-  if ((n = malloc(sizeof(instructions))) == NULL)
+  if ((n = malloc(sizeof(Liste))) == NULL)
     ErrorAst("echec allocation mémoire");
   p->val = n;
 
+  if(suiv != NULL)
+    p->val->liste.taille = suiv->val->liste.taille +1;
+  else
+    p->val->liste.taille = 1;
+  
   p->val->liste.val = exp;
   p->val->liste.suiv = suiv;
 
@@ -185,37 +206,37 @@ ast * CreerNoeudLISTE(ast * exp, ast * suiv){
 }
 
 
-ast * CreerFeuilleLIRE_ELEM_LISTE(char* id, ast* exp){
+ast * CreerFeuilleLIRE_IDL(char* id, ast* exp){
   ast * p;
   INIT_NOEUD(p);
   p->type = AST_IDL;
-  strcpy(p->type_str,"ELEM_LISTE");
+  strcpy(p->type_str,"IDL");
 
   valeur* n;
   if ((n = malloc(sizeof(affectation))) == NULL)
     ErrorAst("echec allocation mémoire");
   p->val = n;
 
-  strcpy(p->val->elem_liste.id, id);
-  p->val->elem_liste.exp = exp;
+  strcpy(p->val->IDL.id, id);
+  p->val->IDL.exp = exp;
 
   return p;
 }
 
-ast * CreerFeuilleAFFECTLISTE(char* id, ast* pos, ast* exp){
+ast * CreerFeuilleAFFECT_IDL(char* id, ast* pos, ast* exp){
   ast * p;
   INIT_NOEUD(p);
   p->type = AST_AFF_IDL;
-  strcpy(p->type_str,"AFF_LISTE");
+  strcpy(p->type_str,"AFF_IDL");
 
   valeur* n;
-  if ((n = malloc(sizeof(affect_elem_liste))) == NULL)
+  if ((n = malloc(sizeof(affect_IDL))) == NULL)
     ErrorAst("echec allocation mémoire");
   p->val = n;
 
-  strcpy(p->val->affect_liste.id, id);
-  p->val->affect_liste.pos = pos;
-  p->val->affect_liste.exp = exp;
+  strcpy(p->val->affect_idl.id, id);
+  p->val->affect_idl.pos = pos;
+  p->val->affect_idl.exp = exp;
 
   return p;
 }
@@ -304,12 +325,80 @@ ast * CreerFONCTION(char* id, ast* param, ast* decla, ast* inst){
   p->val = n;
 
   strcpy(p->val->algo.id, id);
+  printf("str dans fct %s\n",id);
   p->val->algo.param = param;
+  if(inst == NULL)
+    return p;
   p->val->algo.decl_liste = decla;
   p->val->algo.inst = inst;
 
   return p;
 }
+
+
+ast * CreerNoeudPROGRAMME(ast* pre_main, ast* main){
+  ast * p;
+  INIT_NOEUD(p);
+  p->type = AST_PROGRAMME;
+  strcpy(p->type_str,"PROGRAMME");
+
+  valeur* n;
+  if ((n = malloc(sizeof(programme))) == NULL)
+    ErrorAst("echec allocation mémoire");
+  p->val = n;
+
+  if (pre_main != NULL)
+    p->val->prog.nb_global = pre_main->val->pre_main.nb_global;
+  else
+    p->val->prog.nb_global = 0;
+  
+  p->val->prog.pre_main = pre_main;
+  p->val->prog.main = main;
+
+  return p;
+}
+
+ast * CreerNoeudPRE_MAIN(ast* decla, ast* suiv){
+  ast * p;
+  INIT_NOEUD(p);
+  p->type = AST_PRE_MAIN;
+  strcpy(p->type_str,"PRE_MAIN");
+
+  valeur* n;
+  if ((n = malloc(sizeof(programme))) == NULL)
+    ErrorAst("echec allocation mémoire");
+  p->val = n;
+
+  if(suiv != NULL)
+    p->val->pre_main.nb_global = suiv->val->pre_main.nb_global +1;
+  else
+    p->val->pre_main.nb_global = 1;
+  
+  p->val->pre_main.pre_main = decla;
+  p->val->pre_main.main = suiv;
+
+  return p;
+
+
+}
+
+ast * CreerNoeudMAIN(ast* decla, ast* inst){
+  ast * p;
+  INIT_NOEUD(p);
+  p->type = AST_MAIN;
+  strcpy(p->type_str,"MAIN");
+
+  valeur* n;
+  if ((n = malloc(sizeof(instructions))) == NULL)
+    ErrorAst("echec allocation mémoire");
+  p->val = n;
+
+  p->val->main.val = decla;
+  p->val->main.suiv = inst;
+
+  return p;
+}
+
 
 ast * CreerAPPEL_FONCTION(char* id, ast* param){
   ast * p;
@@ -341,6 +430,9 @@ void PrintAst(ast * p, char* indent){
     PrintNB(p,indent);
     break;
   case AST_ID:
+    PrintID(p,indent);
+    break;
+  case AST_ADR:
     PrintID(p,indent);
     break;
   case AST_OP:
@@ -389,6 +481,23 @@ void PrintAst(ast * p, char* indent){
     break;
   case AST_RETOURNE:
     PrintRETOURNE(p, indent);
+    break;
+  case AST_PROGRAMME:
+    printf( TXT_BOLD TXT_RED "PROGRAMME :\n");
+    PrintAst(p->val->prog.pre_main, indent);
+    PrintAst(p->val->prog.main, indent);
+    break;
+  case AST_PRE_MAIN:
+    PrintAst(p->val->pre_main.pre_main, indent);
+    if(p->val->pre_main.main != NULL)
+      PrintAst(p->val->pre_main.main, indent);
+    break;
+  case AST_MAIN:
+    printf( TXT_BOLD TXT_RED "MAIN :\n");
+    printf(TXT_BOLD TXT_RED "arbre declarations\n");
+    PrintAst(p->val->main.val, indent);
+    printf(TXT_BOLD TXT_RED "arbre instructions\n");
+    PrintAst(p->val->main.suiv, indent);
     break;
   default:
     fprintf(stderr,"[Erreur] type <%d>: %s non reconnu\n",p->type,p->type_str);
@@ -458,17 +567,21 @@ static void PrintINST(ast *p, char * indent){
 static void PrintSI(ast *p, char * indent){
   printf("%s" TXT_BOLD TXT_BLUE "Noeud:  " TXT_NULL "%p\n",indent, p);
   printf("%s" TXT_BOLD "Type:   " TXT_NULL "%s\n",indent, p->type_str);
+  
   //SI EXP
+  printf("%s" TXT_BOLD TXT_GREEN "CONDITION:\n",indent);
   strcat(indent, "    ");
   PrintAst(p->val->si.exp, indent);
   indent[strlen(indent) -4] = 0;
 
   //ALORS INST
+  printf("%s" TXT_BOLD TXT_GREEN "ALORS:\n",indent);
   strcat(indent, "    ");
   PrintAst(p->val->si.alors, indent);
   indent[strlen(indent) -4] = 0;
 
   //SINON INST
+  printf("%s" TXT_BOLD TXT_GREEN "SINON:\n",indent);
   strcat(indent, "    ");
   PrintAst(p->val->si.sinon, indent);
   indent[strlen(indent) -4] = 0;
@@ -477,12 +590,15 @@ static void PrintSI(ast *p, char * indent){
 static void PrintTQ(ast *p, char * indent){
   printf("%s" TXT_BOLD TXT_BLUE "Noeud:  " TXT_NULL "%p\n",indent, p);
   printf("%s" TXT_BOLD "Type:   " TXT_NULL "%s\n",indent, p->type_str);
+
   //TQ EXP
+  printf("%s" TXT_BOLD TXT_GREEN "CONDITION:\n",indent);
   strcat(indent, "    ");
   PrintAst(p->val->tq.exp, indent);
   indent[strlen(indent) -4] = 0;
 
   // INST
+  printf("%s" TXT_BOLD TXT_GREEN "FAIRE:\n",indent);
   strcat(indent, "    ");
   PrintAst(p->val->tq.faire, indent);
   indent[strlen(indent) -4] = 0;
@@ -494,16 +610,19 @@ static void PrintFCT(ast *p, char * indent){
   printf("%s" TXT_BOLD "Type:   " TXT_NULL "%s\n",indent, p->type_str);
   printf("%s" TXT_BOLD "val: " TXT_NULL "%s\n",indent, p->val->algo.id);
   //PARAM
+  printf("%s" TXT_BOLD TXT_GREEN "PARAMETRES:\n",indent);
   strcat(indent, "    ");
   PrintAst(p->val->algo.param, indent);
   indent[strlen(indent) -4] = 0;
 
   //DECLA
+  printf("%s" TXT_BOLD TXT_GREEN "DECLARATIONS:\n",indent);
   strcat(indent, "    ");
   PrintAst(p->val->algo.decl_liste, indent);
   indent[strlen(indent) -4] = 0;
 
   //INST
+  printf("%s" TXT_BOLD TXT_GREEN "INSTRUCTIONS:\n",indent);
   strcat(indent, "    ");
   PrintAst(p->val->algo.inst, indent);
   indent[strlen(indent) -4] = 0;
@@ -516,6 +635,7 @@ static void PrintAPPEL_FCT(ast *p, char * indent){
   printf("%s" TXT_BOLD "val: " TXT_NULL "%s\n",indent, p->val->appel.id);
 
   //param a passer
+  printf("%s" TXT_BOLD TXT_GREEN "PARAMETRES:\n",indent);
   strcat(indent, "    ");
   PrintAst(p->val->appel.exp, indent);
   indent[strlen(indent) -4] = 0;
@@ -525,6 +645,7 @@ static void PrintAPPEL_FCT(ast *p, char * indent){
 static void PrintLIST(ast *p, char * indent){
   printf("%s" TXT_BOLD TXT_BLUE "Noeud:  " TXT_NULL "%p\n",indent, p);
   printf("%s" TXT_BOLD "Type:   " TXT_NULL "%s\n",indent, p->type_str);
+  printf("%s" TXT_BOLD "Taille: " TXT_NULL "%d\n",indent, p->val->liste.taille);
   strcat(indent, "    ");
   ast * exp = p;
   while(exp != NULL){
@@ -538,10 +659,10 @@ static void PrintLIST(ast *p, char * indent){
 static void PrintIDL(ast *p, char * indent){
   printf("%s" TXT_BOLD TXT_BLUE "Noeud:  " TXT_NULL "%p\n",indent, p);
   printf("%s" TXT_BOLD "Type:   " TXT_NULL "%s\n",indent, p->type_str);
-  printf("%s" TXT_BOLD "val: " TXT_NULL "%s\n",indent, p->val->elem_liste.id);
+  printf("%s" TXT_BOLD "val: " TXT_NULL "%s\n",indent, p->val->IDL.id);
 
   strcat(indent, "    ");
-  PrintAst(p->val->elem_liste.exp, indent);
+  PrintAst(p->val->IDL.exp, indent);
   indent[strlen(indent) -4] = 0;
 
 }
@@ -549,16 +670,18 @@ static void PrintIDL(ast *p, char * indent){
 static void PrintAFF_IDL(ast *p, char * indent){
   printf("%s" TXT_BOLD TXT_BLUE "Noeud:  " TXT_NULL "%p\n",indent, p);
   printf("%s" TXT_BOLD "Type:   " TXT_NULL "%s\n",indent, p->type_str);
-  printf("%s" TXT_BOLD "val: " TXT_NULL "%s\n",indent, p->val->affect_liste.id);
+  printf("%s" TXT_BOLD "val: " TXT_NULL "%s\n",indent, p->val->affect_idl.id);
 
   //POS
+  printf("%s" TXT_BOLD TXT_GREEN "POSITION:\n",indent);
   strcat(indent, "    ");
-  PrintAst(p->val->affect_liste.pos, indent);
+  PrintAst(p->val->affect_idl.pos, indent);
   indent[strlen(indent) -4] = 0;
 
   //EXP
+  printf("%s" TXT_BOLD TXT_GREEN "AFFECTER:\n",indent);
   strcat(indent, "    ");
-  PrintAst(p->val->affect_liste.exp, indent);
+  PrintAst(p->val->affect_idl.exp, indent);
   indent[strlen(indent) -4] = 0;
 }
 

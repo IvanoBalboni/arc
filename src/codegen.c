@@ -7,62 +7,38 @@ int LEN  = 0;
 //
 int NB_VARIABLES = 0;
 
-int CONTEXTE_CHGT = 1;
+int CONTEXTE_CHGT = 0;
 
-void codegenInit(){
+void codegenInit(ast * p){
   //l'adresse de la pile sera connue une fois sorti de GLOBAL et modifie a ce moment >> besoin de fopen "w+"
-  genPrintVal("LOAD #%-7d ; ", "init l'adresse de la pile\n", -20);
+  genPrintVal("LOAD #%-7d ; ", "init l'adresse de GLOBAL\n", 8);
+  genPrintVal("STORE %-7d ; ", "PILE <- ACC\n", GLOBAL);
+  genPrintVal("LOAD #%-7d ; ", "init l'adresse de la pile\n", 8 + p->val->prog.nb_global);
   genPrintVal("STORE %-7d ; ", "PILE <- ACC\n", PILE);
   //l'adresse de main() sera connue une fois au debut de MAIN et modifie a ce moment
-  genPrintVal("JUMP %-8d ; ", "JUMP a la 1ere instruction de MAIN()\n", -20);
 
   //TODO: PILE LEN VARIBLES etc. tec.
 }
 
-void codegenInitMAIN(){
-  CONTEXTE_CHGT = 0;
-  char temp[128];
 
-  if (fseek(exefile, 6, SEEK_SET) != 0)
-    printf("CONDEGEN INIT MAIN NON \n#\n#\n");
-  fprintf(exefile, "%-6d", NB_VARIABLES + 8);
-  for (size_t i = 0; i < 2; i++){//passe la ligne courante et la suivante
-    fscanf(exefile,"%[^\n]",temp);
-    fscanf(exefile,"%c",temp);
-    temp[0] = '\0';
-  }
-  
-  if (fseek(exefile, 5, SEEK_CUR) != 0)
-    printf("CONDEGEN INIT MAIN NON \n#\n#\n");
-  fprintf(exefile, "%-8d", LEN);
-
-  fseek(exefile, 0, SEEK_END);
-  genPrintVal("LOAD %-8d ; ", "(DEBUT MAIN) // ACC <- PILE\n", PILE);
+void codegenInitCONTEXTE(char* ctxt){
+  setCONTEXTE(ctxt);
+  char comment[64];
+  sprintf(comment, "##DEBUT %s## // ACC <- PILE\n", ctxt);
+  genPrintVal("LOAD %-8d ; ", comment, PILE);
   genPrintVal("STORE %-7d ; ", "LOCAL <- ACC\n", LOCAL);
-
 }
 
-void codegenInitCONTEXTE(){
-
-}
-
-void codegenCHGT_PILE(int sortie_contexte){
-  if (sortie_contexte){
-
-  }else{
-    genPrintVal("LOAD #%-7d ; ", "ACC <- NB Variabls declarees\n", NB_VARIABLES);
-    genPrintVal("ADD %-9d ; "," ACC <- ACC + ADRESSE PILE\n", PILE);
+void codegenCHGT_PILE(){
+  genPrintVal("LOAD #%-7d ; ", "ACC <- NB Variables declarees\n", NB_VARIABLES);
+  genPrintVal("ADD %-9d ; "," ACC <- ACC + ADRESSE PILE\n", PILE);
   genPrintVal("STORE %-7d ; ", "Avance la PILE du nombre de DECL\n", PILE );
-  }
 }
 
 void codegen(ast* p){
   if (p == NULL) return;
   if (CONTEXTE_CHGT){
-    if (strcmp(CONTEXTE, "MAIN") == 0)
-      codegenInitMAIN();
-    else
-      codegenInitCONTEXTE();
+    codegenCHGT_PILE();
   }
 
     switch(p->type){
@@ -80,6 +56,9 @@ void codegen(ast* p){
     break;
     case AST_ID:
       codegenID(p);
+    break;
+    case AST_ADR:
+      codegenADR(p);
     break;
     case AST_OP:
       codegenOP(p);
@@ -111,6 +90,22 @@ void codegen(ast* p){
     case AST_DECL_IDL:
     break;
     case AST_AFF_IDL:
+    break;
+    case AST_PROGRAMME:
+      setCONTEXTE("GLOBAL");
+      codegen(p->val->prog.pre_main);
+      codegen(p->val->prog.main); 
+    break;
+    case AST_PRE_MAIN:
+      codegen(p->val->pre_main.pre_main);
+      if (p->val->pre_main.main != NULL)
+        codegen(p->val->pre_main.main);
+    break;
+    case AST_MAIN:
+      codegenInitCONTEXTE("MAIN");
+      codegen(p->val->main.val);
+      codegenCHGT_PILE();
+      codegen(p->val->main.suiv); 
     break;
     default:
       fprintf(stderr,"[Erreur] type <%d>: %s non reconnu\n",p->type,p->type_str);
@@ -148,6 +143,13 @@ void codegenID(ast* p){
 
   sprintf(comment, "ACC <- %s\n",s->id);
   genPrintVal("LOAD @%-7d ; ", comment, TEMP );
+}
+
+void codegenADR(ast* p){
+  symbole * s = RechercherADR(TABLE_SYMBOLES, p->val->id);
+  char comment[64];
+  sprintf(comment, "ACC <- adresse de %s\n", p->val->id);
+  genPrintVal("LOAD #%-7d ; ", comment, s->adr);
 }
 
 void codegenOP(ast* p){

@@ -1,4 +1,18 @@
-MAIN()
+ALGO TESTREC ( @L, a, b );
+
+ALGO TESTREC ( @L, a, b )
 DEBUT
-	2-5*3+12;
+	L[5] <- a;
+	SI L[5] < a FAIRE
+		L[5] <- L[5] +1;
+		TESTREC( @L, a, b);
+	FSI
+FIN
+
+MAIN()
+VAR L[10];
+VAR a <- 5;
+VAR b <- 3;
+DEBUT
+	TESTREC ( @L, a, b);
 FIN

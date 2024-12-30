@@ -62,7 +62,7 @@ ID              [a-zA-Z_][a-zA-Z_0-9]*
 "="             { return EGAL;}
 "["             { return '[';}
 "]"             { return ']';}
-[-+*/%()<>,]    { return *yytext;}
+[-+*/%()<>,@]   { return *yytext;}
 {ID}            { strcpy(yylval.id, yytext); return ID;}
 .               {
                   sprintf(errmsg,charerr, yytext[0]);

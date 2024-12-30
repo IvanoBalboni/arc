@@ -36,7 +36,7 @@
 %type <tree> PROGRAMME PRE_MAIN FONCTION INSTRUCTIONS EXP DECLARATIONS
 %type <tree> INST DECLA L_ID LISTE AFFECTATION L_PARAM
 
-%token MAIN ALGO LIRE ECRIRE RETOURNE VAR DEBUT FIN SEP AFFECT ','
+%token MAIN ALGO LIRE ECRIRE RETOURNE VAR DEBUT FIN SEP AFFECT ',' '@'
 %token TQ FAIRE FTQ
 %token SI SINON FSI
 %token <nb> NB
@@ -59,16 +59,14 @@ MAIN
 DECLARATIONS
 DEBUT
 INSTRUCTIONS
-FIN                             {
-                                  ARBRE_PRE_MAIN = $1;
-                                  $$ = $5; ARBRE_ABSTRAIT = $$;
-                                  ARBRE_DECLARATION = $3;
+FIN                             { $$ = CreerNoeudPROGRAMME($1, CreerNoeudMAIN($3, $5) );
+                                  ARBRE_ABSTRAIT = $$;
                                 }
 ;
 
 PRE_MAIN: %empty                { $$ = NULL;}
-| VAR DECLA SEP PRE_MAIN        { $$ = CreerNoeudINSTRUCT($2, $4); }
-| FONCTION PRE_MAIN             { $$ = CreerNoeudINSTRUCT($1, $2); }
+| VAR DECLA SEP PRE_MAIN        { $$ = CreerNoeudPRE_MAIN($2, $4); }
+| FONCTION PRE_MAIN             { $$ = CreerNoeudPRE_MAIN($1, $2); }
 ;
 
 FONCTION:
@@ -76,15 +74,18 @@ ALGO ID '(' L_PARAM ')'
 DECLARATIONS
 DEBUT
 INSTRUCTIONS
-FIN                             { $$ = CreerFONCTION(yyval.id, $4, $6, $8);}
+FIN                             { $$ = CreerFONCTION($2, $4, $6, $8);}
+| ALGO ID '(' L_PARAM ')' SEP   { $$ = CreerFONCTION($2, $4, NULL, NULL);}
 ;
 
 L_PARAM: %empty                 { $$ = NULL; }
 |L_ID                           { $$ = $1;   }
 ;
 
-L_ID: ID                        { $$ = CreerNoeudLISTE( CreerFeuilleID($1) , NULL); }
+L_ID: ID                        { $$ = CreerNoeudLISTE( CreerFeuilleID(yyval.id) , NULL); }
+| '@' ID                        { $$ = CreerNoeudLISTE( CreerFeuilleADR($2) , NULL); }
 | ID ',' L_ID                   { $$ = CreerNoeudLISTE( CreerFeuilleID($1) , $3);}
+| '@' ID ',' L_ID               { $$ = CreerNoeudLISTE( CreerFeuilleADR($2) , $4); }
 ;
 
 LISTE: EXP                      { $$ = CreerNoeudLISTE($1, NULL); }
@@ -93,8 +94,14 @@ LISTE: EXP                      { $$ = CreerNoeudLISTE($1, NULL); }
 
 DECLARATIONS: %empty            { $$ = NULL;}
 | VAR DECLA SEP DECLARATIONS    { $$ = CreerNoeudINSTRUCT($2, $4);}
+//TODO: VAR ID DECLA_LISTE SEP DECLARATIONS
 ;
 
+DECLA: ID AFFECT EXP            { $$ = CreerFeuilleDECLA(yyval.id, $3); }
+| ID                            { $$ = CreerFeuilleDECLA(yyval.id, NULL);}
+| ID '[' NB ']'                 { $$ = CreerFeuilleDECLA_IDL(yyval.id, $3, NULL);}
+| ID '[' NB ']' AFFECT '[' LISTE ']'{ $$ = CreerFeuilleDECLA_IDL(yyval.id, $3, $7);}
+;
 
 INSTRUCTIONS: INST              { $$ = CreerNoeudINSTRUCT($1, NULL); }
 | INST INSTRUCTIONS             { $$ = CreerNoeudINSTRUCT($1, $2);   }
@@ -106,18 +113,15 @@ INST: EXP SEP                   { $$ = $1; }
 | VAR DECLA SEP                 { $$ = $2; }
 | AFFECTATION SEP               { $$ = $1; }
 | SI EXP FAIRE INSTRUCTIONS FSI { $$ = CreerNoeudSI($2, $4, NULL);}
+| TQ EXP FAIRE INSTRUCTIONS FTQ { $$ = CreerNoeudTQ($2, $4);}
 | SI EXP FAIRE INSTRUCTIONS SINON INSTRUCTIONS FSI { $$ = CreerNoeudSI($2, $4, $6);}
-| TQ EXP FAIRE INSTRUCTIONS FTQ {$$ = CreerNoeudTQ($2, $4);}
 ;
 
-DECLA: ID AFFECT EXP            {$$ = CreerFeuilleDECLA(yyval.id, $3); }
-| ID '[' NB ']'                 {$$ = CreerFeuilleDECLALISTE(yyval.id, yyval.nb);}
-| ID                            {$$ = CreerFeuilleDECLA(yyval.id, NULL);}
-;
 
 EXP : NB                        { $$ = CreerFeuilleNB(yyval.nb); }
 | ID                            { $$ = CreerFeuilleID(yyval.id); }
-| ID '[' EXP ']'                { $$ = CreerFeuilleLIRE_ELEM_LISTE(yyval.id, $3); }
+| '@' ID                        { $$ = CreerFeuilleADR($2); }
+| ID '[' EXP ']'                { $$ = CreerFeuilleLIRE_IDL(yyval.id, $3); }
 | ID '(' LISTE ')'              { $$ = CreerAPPEL_FONCTION(yyval.id, $3); }
 | EXP '+' EXP                   { $$ = CreerNoeudOP(OP_PLUS,  $1, $3); }
 | EXP '-' EXP                   { $$ = CreerNoeudOP(OP_MOINS, $1, $3); }
@@ -137,7 +141,7 @@ EXP : NB                        { $$ = CreerFeuilleNB(yyval.nb); }
 ;
 
 AFFECTATION: ID AFFECT EXP     { $$ = CreerFeuilleAFFECT(yyval.id, $3); }
-| ID '[' EXP ']' AFFECT EXP    { $$ = CreerFeuilleAFFECTLISTE(yyval.id, $3, $6);}
+| ID '[' EXP ']' AFFECT EXP    { $$ = CreerFeuilleAFFECT_IDL(yyval.id, $3, $6);}
 ;
 
 %%
@@ -164,32 +168,20 @@ int main( int argc, char * argv[] ) {
   exefile = fopen(exename,"w+");
   yyparse();
   char indent[32] = "";
-  printf(TXT_BOLD TXT_RED "arbre declarations\n");
-  PrintAst( ARBRE_DECLARATION, indent);
-  printf(TXT_BOLD TXT_RED "arbre instructions\n");
   PrintAst( ARBRE_ABSTRAIT, indent);
 
   TABLE_SYMBOLES = TableSymbInit();
-
-  setCONTEXTE("MAIN");
-  printTS(TABLE_SYMBOLES);
   printf("pb0\n");
 
-
-  semantic(ARBRE_DECLARATION);
-  printf("pb1\n");
   semantic(ARBRE_ABSTRAIT);
   printf("pb2\n");
 
   printTS(TABLE_SYMBOLES);
   printf("codegen oui\n" );
 
-  codegenInit();
+  codegenInit(ARBRE_ABSTRAIT);
   printf("init pass\n");
 
-  codegen(ARBRE_DECLARATION);
-  printf("codegen 2\n" );
-  codegenCHGT_PILE(0);
   codegen(ARBRE_ABSTRAIT);
   printf("codegen 3\n" );
   codegenFIN();

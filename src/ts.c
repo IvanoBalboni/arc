@@ -4,10 +4,11 @@
 char CONTEXTE[32] = "GLOBAL";
 char CHERCHE_SYMB_GLOBAL = 0;// 0 si local, 1 si global
 
-char * STR_TYPE[9] = {
+char * STR_TYPE[11] = {
   "ID", "ID_DECLA", "ID_AFFECT",
-  "LID", "LID_DECLA", "LID_AFFECT",
-  "FCT", "FCT_DECLA ", "FIN"
+  "IDL", "IDL_DECLA", "IDL_AFFECT",
+  "FCT", "FCT_PROTO", "FCT_DECLA ", "ADR",
+  "FIN"
 };
 
 table_symb * TableSymbInit(){
@@ -40,8 +41,9 @@ contexte * contexteAdd(symbole * s){
 void AjouterCTXT(table_symb * ts, char* ctxt){
   table_symb * suiv = ts;
   while (suiv->suiv != NULL) {
-    if (strcmp(suiv->contexte, ctxt) == 0)
-      ErrorTs("AJOUT: Contexte existe deja");
+    if (strcmp(suiv->suiv->contexte, ctxt) == 0)
+      return; // contexte existe deja
+    suiv = suiv->suiv;
   }
 
   if ((suiv->suiv = malloc(sizeof(table_symb))) == NULL)
@@ -97,7 +99,7 @@ symbole * RechercherSymb(table_symb * ts, char * id, Type type){
   if (ts == NULL)
     //ErrorTs("recherche symb: pas de ts");
     return NULL;
-
+  
   table_symb * suiv = ts;
   contexte * ctxt_suiv;
   while (suiv != NULL) { //Parcours du tableau de contextes
@@ -133,6 +135,17 @@ symbole * RechercherSymb(table_symb * ts, char * id, Type type){
 
   //ErrorTs("symbole pas trouve ni dans ctxt ni dans global")
   return NULL;
+}
+
+symbole * RechercherADR(table_symb * ts, char * id){
+  symbole* s;
+  s = RechercherSymb(ts, id, TS_ADR);
+  if (s != NULL)
+    return s;
+  s = RechercherSymb(ts, id, TS_IDL_DECLA);
+  if (s != NULL)
+    return s;
+  return RechercherSymb(ts, id, TS_DECLA);
 }
 
 void setCONTEXTE(char* ctxt){

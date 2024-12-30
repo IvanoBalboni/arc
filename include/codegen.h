@@ -12,7 +12,7 @@ extern char         CHERCHE_SYMB_GLOBAL;
 
 
 enum{
-    TEMP = 1, APPEL_FCT = 2, PILE = 3, LOCAL = 4, GLOBAL = 5, ADR_AFFECT = 6
+    TEMP = 1, RETOUR_FCT = 2, PILE = 3, GLOBAL = 4, LOCAL = 5, ADR_AFFECT = 6
 };
 
 
@@ -28,19 +28,20 @@ enum{
 
 
 //utilise la TS pour initialiser PILE apres les var globales & fonctions
-void codegenInit();//jump @main
+void codegenInit(ast * p);//jump @main
 
-void codegenInitMain();
+//void codegenInitMain();
 
-void codegenInitCONTEXTE();
+void codegenInitCONTEXTE(char* ctxt);
 
-void codegenCHGT_PILE(int sortie_contexte);
+void codegenCHGT_PILE();
 
 //ecrit dans le fichier exefile les instructions machine RAM
 void codegen(ast* p);
 
 void codegenNB(ast* p);
 void codegenID(ast* p);
+void codegenADR(ast* p);
 void codegenOP(ast* p);
 void codegenDECLA(ast* p);
 void codegenAFFECT(ast* p);
