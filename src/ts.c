@@ -66,13 +66,7 @@ void AjouterSymb(table_symb * ts, symbole * symb){
       }
       ctxt_suiv = suiv->table_ctxt;
       while (ctxt_suiv->suiv != NULL) { ctxt_suiv= ctxt_suiv->suiv; }
-      //printf("avant ajout\n" );
-      //printTS(ts);
       ctxt_suiv->suiv = contexteAdd(symb);
-      //printf("apres ajout\n" );
-      //printTS(ts);
-      //printf("ts add %s %s %p\n",suiv->contexte , suiv->table_ctxt->symb->id ,suiv->table_ctxt );
-      //printf("ts verif add %s %s %p\n", ts->suiv->contexte, ts->suiv->table_ctxt->symb->id ,ts->suiv->table_ctxt );
       return;
     }
     suiv = suiv->suiv;
@@ -97,11 +91,11 @@ symbole * RechercherSymb(table_symb * ts, char * id, Type type){
   */
 
   if (ts == NULL)
-    //ErrorTs("recherche symb: pas de ts");
     return NULL;
-  
   table_symb * suiv = ts;
   contexte * ctxt_suiv;
+  if (strcmp(CONTEXTE, "GLOBAL") == 0)//recherche dans GLOBAL
+    suiv = NULL;
   while (suiv != NULL) { //Parcours du tableau de contextes
     if (strcmp(suiv->contexte, CONTEXTE) == 0){ //contexte trouve
       ctxt_suiv = suiv->table_ctxt;
@@ -119,10 +113,8 @@ symbole * RechercherSymb(table_symb * ts, char * id, Type type){
     suiv = suiv->suiv;
   }
 
-  //id == ts->symb.id
   if (strcmp(ts->contexte, "GLOBAL") != 0)
     ErrorTs("contexte GLOBAL non existant");
-  //return NULL;
 
   ctxt_suiv = ts->table_ctxt;// cherche symbole dans GLOBAL
   while (ctxt_suiv != NULL) { //Parcours de GLOBAL
@@ -133,7 +125,6 @@ symbole * RechercherSymb(table_symb * ts, char * id, Type type){
     ctxt_suiv = ctxt_suiv->suiv;
   }
 
-  //ErrorTs("symbole pas trouve ni dans ctxt ni dans global")
   return NULL;
 }
 

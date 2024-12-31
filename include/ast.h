@@ -75,7 +75,7 @@ typedef struct{
   struct ast*    suiv;
 }instructions;
 
-typedef struct{//stocke le memes donnees que instructions mais a un role different
+typedef struct{//stocke le memes donnees que instructions mais avec des noms differents
   struct ast*    exp;
   struct ast*    faire;
 }tant_que;
@@ -99,7 +99,7 @@ typedef struct{
   struct ast*    main;
 }programme;
 
-typedef union val{
+typedef union valeur{
   int               nb;
   variable          id;
   affectation       decl;   //peut affecter dans la decl
