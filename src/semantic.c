@@ -67,6 +67,7 @@ void semantic(ast * p){
       p->codelen = 2 + p->val->tq.exp->codelen + p->val->tq.faire->codelen;
     break;
     case AST_FCT:
+      //printf("fct\n");
       semanticFCT(p);
     break;
     case AST_APPEL_FCT:
@@ -100,14 +101,17 @@ void semantic(ast * p){
       p->codelen = 7 + p->val->affect_idl.exp->codelen + p->val->affect_idl.pos->codelen;
     break;
     case AST_PROGRAMME:
+      //printf("sem 1\n");
       semantic(p->val->prog.pre_main);
+      //printf("sem 2\n");
       p->val->prog.nb_global = GLOBAL_ADR;
       semantic(p->val->prog.main);
+      //printf("sem 3\n");
       if(p->val->prog.pre_main == NULL){
         p->val->prog.pre_main = CreerNoeudINSTRUCT(NULL, NULL);
         p->val->prog.pre_main->codelen = 0;
       }
-      p->codelen = 4 + p->val->prog.pre_main->codelen + p->val->prog.main->codelen;
+      p->codelen = p->val->prog.pre_main->codelen + p->val->prog.main->codelen;
       printf("len prog: %d // preprog: %d main: %d\n",p->codelen, p->val->prog.pre_main->codelen, p->val->prog.main->codelen);
     break;
     case AST_PRE_MAIN:
@@ -124,7 +128,7 @@ void semantic(ast * p){
       semantic(p->val->main.suiv);
       decl_len = (p->val->main.val != NULL) ? p->val->main.val->codelen : 0;
       instlen = (p->val->main.suiv != NULL) ? p->val->main.suiv->codelen : 0;
-      p->codelen = decl_len + instlen; 
+      p->codelen = 8 + decl_len + instlen; 
       printf("len main: %d // decl: %d inst: %d \n", p->codelen, decl_len, instlen);
     break;
   }
@@ -210,6 +214,7 @@ void semanticFCT(ast * p){
 
   if (symb == NULL){
     AjouterSymb(TABLE_SYMBOLES, CreerSymb(p->val->algo.id, GLOBAL_ADR, TS_FCT_PROTO));
+    symb = RechercherSymb(TABLE_SYMBOLES, p->val->algo.id, TS_FCT_PROTO);
     GLOBAL_ADR++;
     ajouttaille = 1;
     param = p->val->algo.param;
@@ -237,7 +242,12 @@ void semanticFCT(ast * p){
     LOCAL_ADR++; 
     param = param->val->liste.suiv;
   }
+  
+  if (ajouttaille == 0)
+    LOCAL_ADR = RechercherSymb(TABLE_SYMBOLES, "param", TS_FCT_PROTO)->adr;
+
   semantic(p->val->algo.decl_liste);
+
   semantic(p->val->algo.inst);
 
   if (p->val->algo.inst != NULL)
@@ -245,7 +255,7 @@ void semanticFCT(ast * p){
   
   decl_len = (p->val->algo.decl_liste != NULL) ? p->val->algo.decl_liste->codelen : 0;
   instlen = (p->val->algo.inst != NULL) ? p->val->algo.inst->codelen : 0;
-  p->codelen = 25 + decl_len + instlen;
+  p->codelen = 29 + decl_len + instlen;
   LOCAL_ADR = 0;
   setCONTEXTE("GLOBAL");
 }
@@ -267,6 +277,7 @@ void semanticAPPL(ast * p){
   if (param->val->liste.taille != RechercherSymb(TABLE_SYMBOLES, "param", TS_FCT_PROTO)->adr)
     ErrorSemantic("APPEL: Pas le meme nb. de parametres que le prototype.");
   p->codelen = 14 + p->val->appel.exp->codelen;
+  setCONTEXTE(temp);
 }
 
 int lenOP(typeOP op, int exp1, int exp2){

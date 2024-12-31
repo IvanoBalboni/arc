@@ -2141,19 +2141,17 @@ int main( int argc, char * argv[] ) {
   PrintAst( ARBRE_ABSTRAIT, indent);
 
   TABLE_SYMBOLES = TableSymbInit();
-  printf("pb0\n");
+  printf("##\n");
 
   semantic(ARBRE_ABSTRAIT);
-  printf("pb2\n");
+  printf("##\n");
 
   printTS(TABLE_SYMBOLES);
-  printf("codegen oui\n" );
+  printf("debut codegen: \n" );
 
   codegenInit(ARBRE_ABSTRAIT);
-  printf("init pass\n");
 
   codegen(ARBRE_ABSTRAIT);
-  printf("codegen 3\n" );
   codegenFIN();
   fclose(yyin);
 }

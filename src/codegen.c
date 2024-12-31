@@ -124,8 +124,8 @@ void codegen(ast* p){
         codegen(p->val->pre_main.main);
     break;
     case AST_MAIN:
-      codegenInitCONTEXTE("MAIN");
-      genPrintVal("LOAD #%-7d ; ", "LIGNE FIN MAIN\n", LEN -3 + p->codelen);//TODO: a regler 
+      codegenInitCONTEXTE("MAIN");// 3 lignes
+      genPrintVal("LOAD #%-7d ; ", "LIGNE FIN MAIN\n", LEN -3 + p->codelen);
       genPrintVal("STORE %-7d ; ", "LIGNE FIN MAIN\n", RETOUR_FCT);
       codegen(p->val->main.val);
         genPrintVal("LOAD %-8d ; ", "ACC <- ADR PILE\n", PILE);
@@ -380,8 +380,10 @@ void codegenFCT(ast* p){
   }
 
   genPrintVal("JUMP %-8d ; ","##FIN DECLA FCT## // JUMP Apres instructions FONCTION\n", LEN - 5 + p->codelen);
-  genPrintVal("LOAD #%-7d ; ", "LIGNE RETOUR\n", LEN -25 + 7 + p->codelen);
+  genPrintVal("LOAD #%-7d ; ", "LIGNE RETOUR\n", LEN -29 + 7 + p->codelen);
   genPrintVal("STORE %-7d ; ", "RETOUR_FCT <- LIGNE RETOUR\n", RETOUR_FCT);
+  genPrintVal("LOAD #%-7d ; ", "VALEUR RETOUR PAR DEFAUT\n", -999);
+  genPrintVal("STORE %-7d ; ", "VALEUR RETOUR <- DEFAUT\n", VALEUR_RETOUR);
 
   codegenInitCONTEXTE(p->val->algo.id);// DEBUT FCT, 2 lignes
   NB_VARIABLES = p->val->algo.param->val->liste.taille;
@@ -398,6 +400,9 @@ void codegenFCT(ast* p){
   DEPILER("ACC <- RETOUR_FCT appel FCT\n");//2 lignes
   genPrintVal("STORE %-7d ; ", "REOUR_FCT <- ACC\n", RETOUR_FCT);
   DEPILER("ACC <- LIGNE A JUMP APRES RETOUR FCT\n");//2 lignes
+  STOCKER("TEMP <- LIGNE A JUMP APRES RETOUR FCT\n");
+
+  genPrintVal("LOAD %-8d ; ", "VALEUR RETOUR PAR DEFAUT\n", VALEUR_RETOUR);
 
   genPrintVal("JUMP @%-7d ; ","(RETOUR FCT) // JUMP A l'appel de FCT\n", 0);
 }
@@ -497,10 +502,9 @@ void codegenECRIRE(ast* p){
 }
 
 void codegenRETOURNE(ast* p){
-  printf("CMARCHE {PASJSIOJSD} TODO\n");
   codegen(p->val->retourne);
-  LEN++;
-  fprintf(exefile, "WRITE         ; ACC <- SORTIE[I++]\n" );
+  genPrintVal("STORE %-7d ; ", " (DEBUT RETURN) // RETOUR_FCT <- LIGNE RETOUR\n", VALEUR_RETOUR);
+  genPrintVal("JUMP %-8d ; "," JUMP Apres les instructions de FONCTION\n", RETOUR_FCT);
 }
 
 

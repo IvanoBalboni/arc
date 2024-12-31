@@ -2,7 +2,7 @@
 #include "codegen.h"
 
 char * STR_OP[13] = {
-  "+" , "-" , "*" , "/", "%",
+  "+" , "-" , "*" , "/", "%%",
   "<=", "<" , ">=", ">",
   "=" , "!=", "OU", "ET"
 };
@@ -325,7 +325,7 @@ ast * CreerFONCTION(char* id, ast* param, ast* decla, ast* inst){
   p->val = n;
 
   strcpy(p->val->algo.id, id);
-  printf("str dans fct %s\n",id);
+  //printf("str dans fct %s\n",id);
   p->val->algo.param = param;
   if(inst == NULL)
     return p;

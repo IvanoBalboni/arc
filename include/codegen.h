@@ -12,7 +12,7 @@ extern char         CHERCHE_SYMB_GLOBAL;
 
 
 enum{
-    TEMP = 1, PILE = 2, GLOBAL = 3, LOCAL = 4, ADR_AFFECT = 5, RETOUR_FCT = 6
+    TEMP = 1, PILE = 2, GLOBAL = 3, LOCAL = 4, ADR_AFFECT = 5, RETOUR_FCT = 6, VALEUR_RETOUR = 7
 };
 
 
