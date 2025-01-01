@@ -4,9 +4,11 @@
 
 int GLOBAL_ADR = 0;
 int LOCAL_ADR = 0;
+char DECLetAFF = 0;
 
 void semantic(ast * p){
   if (p == NULL) return;
+  char ERR[64];
   symbole * symb;
   int decl_len, instlen;
   switch(p->type){
@@ -25,17 +27,19 @@ void semantic(ast * p){
     p->codelen = 1;
     break;
     case AST_ID:
+      sprintf(ERR, "ID Variable %s pas declaree",p->val->id);
       symb = RechercherSymb(TABLE_SYMBOLES, p->val->id, TS_AFFECT);
       if (symb == NULL)
         symb = RechercherSymb(TABLE_SYMBOLES, p->val->id, TS_ADR);
       if (symb == NULL)
-        ErrorSemantic("ID Variable pas declaree");
+        ErrorSemantic(ERR);
       p->codelen = 4;
     break;
     case AST_ADR:
+      sprintf(ERR, "ID Adresse %s pas declaree",p->val->id);
       symb = RechercherADR(TABLE_SYMBOLES, p->val->id);
       if (symb == NULL)
-        ErrorSemantic("ID Adresse pas declaree");
+        ErrorSemantic(ERR);
       p->codelen = 2;
     break;
     case AST_OP:
@@ -83,35 +87,34 @@ void semantic(ast * p){
       }
     break;
     case AST_IDL:
+      sprintf(ERR, "IDL: Adresse %s pas declaree",p->val->id);
       symb = RechercherADR(TABLE_SYMBOLES, p->val->id);
       if (symb == NULL)
-        ErrorSemantic("IDL: Adresse pas declaree");
+        ErrorSemantic(ERR);
       semantic(p->val->IDL.exp);
-      p->codelen = 6 + p->val->IDL.exp->codelen;
+      p->codelen = 5 + p->val->IDL.exp->codelen;
     break;
     case AST_DECL_IDL:
       semanticDECLIDL(p);
     break;
     case AST_AFF_IDL:
+      sprintf(ERR, "AFF IDL: Adresse %s pas declaree",p->val->id);
       symb = RechercherADR(TABLE_SYMBOLES, p->val->id);
       if (symb == NULL)
-        ErrorSemantic("AFF IDL: Adresse pas declaree");
+        ErrorSemantic(ERR);
       semantic(p->val->affect_idl.exp);
       semantic(p->val->affect_idl.pos);
-      p->codelen = 7 + p->val->affect_idl.exp->codelen + p->val->affect_idl.pos->codelen;
+      p->codelen = 6 + p->val->affect_idl.exp->codelen + p->val->affect_idl.pos->codelen;
     break;
     case AST_PROGRAMME:
-      //printf("sem 1\n");
       semantic(p->val->prog.pre_main);
-      //printf("sem 2\n");
       p->val->prog.nb_global = GLOBAL_ADR;
       semantic(p->val->prog.main);
-      //printf("sem 3\n");
       if(p->val->prog.pre_main == NULL){
         p->val->prog.pre_main = CreerNoeudINSTRUCT(NULL, NULL);
         p->val->prog.pre_main->codelen = 0;
       }
-      p->codelen = p->val->prog.pre_main->codelen + p->val->prog.main->codelen;
+      p->codelen = 5+ p->val->prog.pre_main->codelen + p->val->prog.main->codelen;
       printf("len prog: %d // preprog: %d main: %d\n",p->codelen, p->val->prog.pre_main->codelen, p->val->prog.main->codelen);
     break;
     case AST_PRE_MAIN:
@@ -128,7 +131,7 @@ void semantic(ast * p){
       semantic(p->val->main.suiv);
       decl_len = (p->val->main.val != NULL) ? p->val->main.val->codelen : 0;
       instlen = (p->val->main.suiv != NULL) ? p->val->main.suiv->codelen : 0;
-      p->codelen = 8 + decl_len + instlen; 
+      p->codelen = 9 + decl_len + instlen; 
       printf("len main: %d // decl: %d inst: %d \n", p->codelen, decl_len, instlen);
     break;
   }
@@ -138,18 +141,27 @@ void semanticDECL(ast * p){
   symbole * symb = RechercherSymb(TABLE_SYMBOLES, p->val->decl.id, TS_DECLA);
   if ( symb == NULL){
     if(strcmp(CONTEXTE, "GLOBAL") == 0){
-      AjouterSymb(TABLE_SYMBOLES, CreerSymb(p->val->decl.id, LOCAL_ADR, TS_DECLA));
+      printf("ca devrait creer la\n");
+      AjouterSymb(TABLE_SYMBOLES, CreerSymb(p->val->decl.id, GLOBAL_ADR, TS_DECLA));
       GLOBAL_ADR++;
-    }else{
+    }else {
       AjouterSymb(TABLE_SYMBOLES, CreerSymb(p->val->decl.id, LOCAL_ADR, TS_DECLA));
       LOCAL_ADR++;
     }
   }
+  else if (CHERCHE_SYMB_GLOBAL)
+  {
+    AjouterSymb(TABLE_SYMBOLES, CreerSymb(p->val->decl.id, LOCAL_ADR, TS_DECLA));
+    LOCAL_ADR++;
+  }
   else
     ErrorSemantic("Variable deja declaree");
+
   p->codelen = 4;
   if(p->val->decl.exp != NULL){
+    DECLetAFF = 1;
     semantic(p->val->decl.exp);
+    DECLetAFF = 0;
     p->codelen += p->val->decl.exp->codelen;
   }
 
@@ -159,15 +171,21 @@ void semanticDECLIDL(ast * p){
   symbole * symb = RechercherSymb(TABLE_SYMBOLES, p->val->decl_liste.id, TS_IDL_DECLA);
   if ( symb == NULL){
     if(strcmp(CONTEXTE, "GLOBAL") == 0){
-      AjouterSymb(TABLE_SYMBOLES, CreerSymb(p->val->decl_liste.id, LOCAL_ADR, TS_IDL_DECLA));
+      AjouterSymb(TABLE_SYMBOLES, CreerSymb(p->val->decl_liste.id, GLOBAL_ADR, TS_IDL_DECLA));
       GLOBAL_ADR+= p->val->decl_liste.taille;
     }else{
       AjouterSymb(TABLE_SYMBOLES, CreerSymb(p->val->decl_liste.id, LOCAL_ADR, TS_IDL_DECLA));
       LOCAL_ADR+= p->val->decl_liste.taille;
     }
   }
+  else if (CHERCHE_SYMB_GLOBAL)
+  {
+      AjouterSymb(TABLE_SYMBOLES, CreerSymb(p->val->decl_liste.id, LOCAL_ADR, TS_IDL_DECLA));
+      LOCAL_ADR+= p->val->decl_liste.taille;
+  }
   else
     ErrorSemantic("DECL IDL: Variable deja declaree");
+  
   if(p->val->decl_liste.liste != NULL){
     if (p->val->decl_liste.taille != p->val->decl_liste.liste->val->liste.taille)
       ErrorSemantic("DECL IDL: Liste de taille differente d'IDL.");
@@ -181,14 +199,15 @@ void semanticDECLIDL(ast * p){
 void semanticAFF(ast * p){
   symbole * symb = RechercherSymb(TABLE_SYMBOLES, p->val->affect.id, TS_DECLA);
   //printf("%s\n",CONTEXTE);
+  int len;
   if (symb == NULL)
     ErrorSemantic("AFF Variable pas declaree");
   else{
     AjouterSymb(TABLE_SYMBOLES, CreerSymb(symb->id, symb->adr, TS_AFFECT));
   }
   semantic(p->val->affect.exp);
-  p->codelen = 4 + p->val->decl.exp->codelen;
-
+  len = (DECLetAFF)? 0 : 4;
+  p->codelen = len + p->val->decl.exp->codelen;
 }
 
 void semanticSI(ast * p){
@@ -269,11 +288,12 @@ void semanticAPPL(ast * p){
   if( symb == NULL)
     ErrorSemantic("APPEL: Fonction non existante");
 
-  setCONTEXTE(p->val->appel.id);
+  //setCONTEXTE(p->val->appel.id);
   ast * param = p->val->appel.exp;
 
   semantic(p->val->appel.exp);
-
+  
+  setCONTEXTE(p->val->appel.id);
   if (param->val->liste.taille != RechercherSymb(TABLE_SYMBOLES, "param", TS_FCT_PROTO)->adr)
     ErrorSemantic("APPEL: Pas le meme nb. de parametres que le prototype.");
   p->codelen = 14 + p->val->appel.exp->codelen;
@@ -310,6 +330,7 @@ int lenOP(typeOP op, int exp1, int exp2){
 
 
 void ErrorSemantic(const char * errmsg){
-  fprintf(stderr,"[SEMANTIC error] %s\n",errmsg);
+  printTS(TABLE_SYMBOLES);
+  fprintf(stderr,"[SEMANTIC error] CONTEXTE: %s %s\n",CONTEXTE, errmsg);
   exit(1);
 }

@@ -2153,6 +2153,8 @@ int main( int argc, char * argv[] ) {
 
   codegen(ARBRE_ABSTRAIT);
   codegenFIN();
+
+  printf("codegen fini.\n" );
   fclose(yyin);
 }
 

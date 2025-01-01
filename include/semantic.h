@@ -10,6 +10,7 @@
 
 extern table_symb * TABLE_SYMBOLES;
 extern char         CONTEXTE[32];
+extern char         CHERCHE_SYMB_GLOBAL;
 
 void semantic(ast * p);
 void semanticDECL(ast * p);

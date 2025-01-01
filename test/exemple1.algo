@@ -1,12 +1,13 @@
 ALGO TESTREC ( a, @L, b );
 
-ALGO TESTREC ( a, @L, b )
+ALGO TESTREC ( a, @L, b ) #va modifier L[8] jusqua ce que L[8] >= a
 DEBUT
-	L[5] <- b;
-	SI L[5] < a FAIRE
-		b <- L[5] +1;
+	L[8] <- b;
+	SI L[8] < a FAIRE
+		b <- L[8] +1;
 		TESTREC( a, L, b);
 	FSI
+	ECRIRE b;
 FIN
 
 MAIN()

@@ -1,4 +1,4 @@
-MAIN()
+MAIN()# print la (valeur en entree + 5) * 10 
 VAR a;
 VAR b;
 VAR c <- 0;

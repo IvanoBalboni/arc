@@ -1,14 +1,9 @@
+VAR a <- 10;
+VAR b <- 15;
+
 MAIN()
-VAR a;
-VAR b;
-VAR c;
+VAR b <- 30;
 DEBUT
-a <- LIRE();
-b <- LIRE();
-c <- 0;
-TQ a < b FAIRE
-  a <- a + 1;
-  c <- c + 1;
-FTQ
-ECRIRE c;
+ECRIRE a;
+ECRIRE b;
 FIN

@@ -35,7 +35,7 @@ ID              [a-zA-Z_][-a-zA-Z_0-9]*
 
 
 %%
-
+"#".*           { /* ignorer les commentaires*/}
 [ \t\n]         { /* ignorer les blancs */ }
 {NOMBRE}        { yylval.nb = atoll(yytext); return NB; }
 "MAIN()"        { return MAIN;}
@@ -53,6 +53,7 @@ ID              [a-zA-Z_][-a-zA-Z_0-9]*
 "FSI"           { return FSI;}
 "TQ"            { return TQ;}
 "FAIRE"         { return FAIRE;}
+"ALORS"         { return FAIRE;}
 "FTQ"           { return FTQ;}
 "OU"            { return OU;}
 "ET"            { return ET;}

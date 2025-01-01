@@ -13,7 +13,7 @@ void codegenInit(ast * p){
   genPrintVal("STORE %-7d ; ", "PILE <- ACC\n", GLOBAL);
   genPrintVal("LOAD #%-7d ; ", "init l'adresse de la pile\n", 9 /*+ p->val->prog.nb_global*/);
   genPrintVal("STORE %-7d ; ", "PILE <- ACC\n", PILE);
-  ADR_PILE = 0;//relative, sert juste a savoir si fct deja declaree
+  ADR_PILE = 0;//relative, sert aux declarations globales 
 }
 
 
@@ -22,7 +22,13 @@ void codegenInitCONTEXTE(char* ctxt){
   NB_VARIABLES = 0;
   char comment[64];
   sprintf(comment, "##DEBUT %s## // ACC <- PILE\n", ctxt);
-  genPrintVal("LOAD %-8d ; ", comment, PILE);
+  if(strcmp(CONTEXTE,"MAIN") == 0){
+    genPrintVal("LOAD %-8d ; ", comment, GLOBAL);
+    genPrintVal("ADD #%-8d ; ", "AVANCE LA PILE DU NB DE VAR LOCALES\n", ADR_PILE);
+    genPrintVal("STORE %-7d ; ", "\n", PILE);
+  }
+  else
+    genPrintVal("LOAD %-8d ; ", comment, PILE);
   genPrintVal("STORE %-7d ; ", "LOCAL <- ACC\n", LOCAL);
 }
 
@@ -124,8 +130,8 @@ void codegen(ast* p){
         codegen(p->val->pre_main.main);
     break;
     case AST_MAIN:
-      codegenInitCONTEXTE("MAIN");// 3 lignes
-      genPrintVal("LOAD #%-7d ; ", "LIGNE FIN MAIN\n", LEN -3 + p->codelen);
+      codegenInitCONTEXTE("MAIN");// 4 lignes
+      genPrintVal("LOAD #%-7d ; ", "LIGNE FIN MAIN\n", LEN -4 + p->codelen);
       genPrintVal("STORE %-7d ; ", "LIGNE FIN MAIN\n", RETOUR_FCT);
       codegen(p->val->main.val);
         genPrintVal("LOAD %-8d ; ", "ACC <- ADR PILE\n", PILE);
@@ -152,7 +158,7 @@ void codegenID(ast* p){
   if(s == NULL)
     s = RechercherSymb(TABLE_SYMBOLES, p->val->id, TS_ADR);
   if(s == NULL){
-    fprintf(stderr,"codegen ID, symbole non affecte.");
+    fprintf(stderr,"codegen ID, symbole non affecte.\n");
     exit(1);
   }
 
@@ -377,15 +383,15 @@ void codegenFCT(ast* p){
     STOCKER("ADR FCT\n");
     genPrintVal("LOAD #%-7d ; ", "LIGNE FCT\n", LEN +3);
     genPrintVal("STORE @%-6d ; ", "ADR FCT <- LIGNE APPEL FCT\n", TEMP);
-  }
+  }//5 lignes
 
   genPrintVal("JUMP %-8d ; ","##FIN DECLA FCT## // JUMP Apres instructions FONCTION\n", LEN - 5 + p->codelen);
+
+  codegenInitCONTEXTE(p->val->algo.id);// DEBUT FCT, 2 lignes
   genPrintVal("LOAD #%-7d ; ", "LIGNE RETOUR\n", LEN -29 + 7 + p->codelen);
   genPrintVal("STORE %-7d ; ", "RETOUR_FCT <- LIGNE RETOUR\n", RETOUR_FCT);
   genPrintVal("LOAD #%-7d ; ", "VALEUR RETOUR PAR DEFAUT\n", -999);
   genPrintVal("STORE %-7d ; ", "VALEUR RETOUR <- DEFAUT\n", VALEUR_RETOUR);
-
-  codegenInitCONTEXTE(p->val->algo.id);// DEBUT FCT, 2 lignes
   NB_VARIABLES = p->val->algo.param->val->liste.taille;
 
   codegen(p->val->algo.decl_liste);
@@ -404,7 +410,7 @@ void codegenFCT(ast* p){
 
   genPrintVal("LOAD %-8d ; ", "VALEUR RETOUR PAR DEFAUT\n", VALEUR_RETOUR);
 
-  genPrintVal("JUMP @%-7d ; ","(RETOUR FCT) // JUMP A l'appel de FCT\n", 0);
+  genPrintVal("JUMP @%-7d ; ","(RETOUR FCT) // JUMP A l'appel de FCT\n", TEMP);
 }
 
 void codegenAPPEL_FCT(ast* p){
@@ -428,10 +434,11 @@ void codegenLIST(ast* p){
 }
 
 void codegenIDL(ast* p){
-  symbole * s = RechercherADR(TABLE_SYMBOLES, p->val->id);
+  symbole * s;
   char comment[64];
   codegen(p->val->IDL.exp);
-  STOCKER("(DEBUT ID[POS] <-) // TEMP <- POS\n");
+  STOCKER("(DEBUT ID[POS] ) // TEMP <- POS\n");
+  s = RechercherADR(TABLE_SYMBOLES, p->val->id);
   if(CHERCHE_SYMB_GLOBAL){
     sprintf(comment, "(DEBUT IDL) // ACC + adresse GLOBAL\n");
     genPrintVal("LOAD %-8d ; ", comment, GLOBAL );
@@ -444,8 +451,8 @@ void codegenIDL(ast* p){
   sprintf(comment, "ACC + position relative de %s\n", s->id);
   genPrintVal("ADD #%-8d ; ", comment, s->adr);
 
-  sprintf(comment, "ACC + position de  %s\n",s->id);
-  genPrintVal("LOAD @%-7d ; ", comment, 0);
+  //sprintf(comment, "ACC + position de  %s\n",s->id);
+  //genPrintVal("LOAD @%-7d ; ", comment, 0);
 
   genPrintVal("ADD %-9d ; ", "ACC <- ADR ID[POS]\n", TEMP);
 
@@ -465,11 +472,11 @@ void codegenDECL_IDL(ast* p){
 }
 
 void codegenAFF_IDL(ast* p){
-  symbole * s = RechercherADR(TABLE_SYMBOLES, p->val->affect_idl.id);
+  symbole * s;
   char comment[64];
   codegen(p->val->affect_idl.pos);
   STOCKER("(DEBUT ID[POS] <-) // TEMP <- POS\n");
-
+  s = RechercherADR(TABLE_SYMBOLES, p->val->affect_idl.id);
   if(CHERCHE_SYMB_GLOBAL){
     genPrintVal("LOAD %-8d ; ", "ACC <- ADRESSE GLOBAL\n", GLOBAL );
   }
@@ -479,8 +486,8 @@ void codegenAFF_IDL(ast* p){
   sprintf(comment, "ACC + position relative de  %s\n",s->id);
   genPrintVal("ADD #%-8d ; ", comment, s->adr );
 
-  sprintf(comment, "ACC + position de  %s\n",s->id);
-  genPrintVal("LOAD @%-7d ; ", comment, 0);
+  //sprintf(comment, "ACC + position de  %s\n",s->id);
+  //genPrintVal("LOAD @%-7d ; ", comment, 0);
   
   genPrintVal("ADD %-9d ; ", "ACC <- ADR ID[POS]\n", TEMP);
   
@@ -504,7 +511,7 @@ void codegenECRIRE(ast* p){
 void codegenRETOURNE(ast* p){
   codegen(p->val->retourne);
   genPrintVal("STORE %-7d ; ", " (DEBUT RETURN) // RETOUR_FCT <- LIGNE RETOUR\n", VALEUR_RETOUR);
-  genPrintVal("JUMP %-8d ; "," JUMP Apres les instructions de FONCTION\n", RETOUR_FCT);
+  genPrintVal("JUMP @%-7d ; "," JUMP Apres les instructions de FONCTION\n", RETOUR_FCT);
 }
 
 

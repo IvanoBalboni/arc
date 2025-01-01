@@ -1,0 +1,45 @@
+ALGO Echanger(@L,i,j)
+   VAR temp <- L[i];
+DEBUT
+	L[i] <- L[j];
+	L[j] <- temp;
+FIN
+
+ALGO Min(@L, taille)
+    VAR i;
+    VAR min;
+DEBUT
+    min <- L[0];
+    i <- 1;
+    TQ i < taille FAIRE
+        SI L[i] < min FAIRE
+            min <- L[i];
+        FSI
+        i <- i +1;
+    FTQ
+    RETOURNE min;
+FIN
+
+ALGO TriSelection(@L)
+VAR i <- 1;
+VAR imin;
+VAR n <- 10;
+DEBUT
+    TQ i < n FAIRE
+        imin <- Min(L, n);
+        Echanger(L, i, imin);
+        i <- i+1;
+    FTQ
+FIN
+
+
+MAIN()
+VAR L[10] <- [2, 3, 1, 5, 6, 4, 9, 7, 8, 0];
+VAR i <- 0;
+DEBUT
+	TriSelection(@L);
+    TQ i < 10 FAIRE
+        ECRIRE L[i];
+        i <- i +1;
+    FTQ
+FIN

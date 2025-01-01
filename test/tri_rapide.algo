@@ -1,0 +1,61 @@
+ALGO Tri-Rapide(@L,p,r);
+
+ALGO Partitionner(@L,p,r);
+
+ALGO Echanger(@L,i,j)
+   VAR temp <- L[i];
+DEBUT
+	L[i] <- L[j];
+	L[j] <- temp;
+FIN
+
+ALGO Avancer(@L,x,i)
+DEBUT
+	i <- i +1;
+	TQ (L[i] < x) FAIRE
+		i <- i +1;
+	FTQ
+	RETOURNE i;
+FIN
+
+ALGO Reculer(@L,x,j)
+DEBUT
+	j <- j +1;
+	TQ (L[j] > x) FAIRE
+		j <- j +1;
+	FTQ
+	RETOURNE j;
+FIN
+
+ALGO Partitionner(@L,p,r)
+   VAR i;
+   VAR j;
+   VAR x;
+DEBUT
+   x <- L[p];
+   i <- p;
+   j <- r + 1;
+   j <- Reculer(L,x,j);
+   TQ (i < j) FAIRE
+      Echanger(L,i,j);
+      j <- Reculer(L,x,j);
+      i <- Avancer(L,x,i);
+   FTQ
+   RETOURNE(j);
+FIN
+
+ALGO Tri-Rapide(@L,p,r)
+   VAR q;
+DEBUT
+   SI (p < r) FAIRE
+      q <- Partitionner(L,p,r);
+      Tri-Rapide(L,p,q);
+      Tri-Rapide(L,q + 1,r);
+   FSI
+FIN
+
+MAIN()
+VAR L[10] <- [2, 3, 1, 5, 6, 4, 9, 7, 8, 0];
+DEBUT
+	Tri-Rapide(@L, 0, 10);
+FIN

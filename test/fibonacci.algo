@@ -1,0 +1,17 @@
+ALGO fibonacci(i);
+
+ALGO fibonacci(i)
+DEBUT
+    SI i <= 1 ALORS
+        RETOURNE i;
+    SINON
+        RETOURNE fibonacci(i -2) + fibonacci(i - 1);
+    FSI
+FIN
+
+MAIN()
+VAR i;
+DEBUT
+  i <- LIRE();
+  ECRIRE fibonacci(i);
+FIN
