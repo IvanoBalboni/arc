@@ -52,6 +52,8 @@ void setCONTEXTE(char* ctxt);
 
 void printTS(table_symb * ts);
 void printCONTEXTE(contexte * tc);
+
+
 void ErrorTs(const char * errmsg);
 
 #endif

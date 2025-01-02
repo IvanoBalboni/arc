@@ -420,6 +420,80 @@ ast * CreerAPPEL_FONCTION(char* id, ast* param){
 
 void FreeAst(ast * p){
   if (p == NULL) return;
+  switch(p->type){
+  case AST_NB:
+  case AST_ID:
+  case AST_ADR:
+    break;
+  case AST_OP:
+    FreeAst(p->val->op.val[0]);
+    FreeAst(p->val->op.val[1]);
+    break;
+  case AST_AFF:
+    FreeAst(p->val->affect.exp);
+    break;
+  case AST_DECL:
+    FreeAst(p->val->decl.exp);
+    break;
+  case AST_INST:
+    FreeAst(p->val->inst.val);
+    FreeAst(p->val->inst.suiv);
+    break;
+  case AST_SI:
+    FreeAst(p->val->si.exp);
+    FreeAst(p->val->si.alors);
+    FreeAst(p->val->si.sinon);
+    break;
+  case AST_TQ:
+    FreeAst(p->val->tq.exp);
+    FreeAst(p->val->tq.faire);
+    break;
+  case AST_FCT:
+    FreeAst(p->val->algo.param);
+    FreeAst(p->val->algo.decl_liste);
+    FreeAst(p->val->algo.inst);
+    break;
+  case AST_APPEL_FCT:
+    FreeAst(p->val->appel.exp);
+    break;
+  case AST_LIST:
+    FreeAst(p->val->liste.val);
+    FreeAst(p->val->liste.suiv);
+  break;
+  case AST_IDL:
+    FreeAst(p->val->IDL.exp);
+    break;
+  case AST_AFF_IDL:
+    FreeAst(p->val->affect_idl.exp);
+    FreeAst(p->val->affect_idl.pos);
+    break;
+  case AST_DECL_IDL:
+    FreeAst(p->val->decl_liste.liste);
+    break;
+  case AST_LIRE:
+    break;
+  case AST_ECRIRE:
+    FreeAst(p->val->ecrire);
+    break;
+  case AST_RETOURNE:
+    FreeAst(p->val->retourne);
+    break;
+  case AST_PROGRAMME:
+    FreeAst(p->val->prog.pre_main);
+    FreeAst(p->val->prog.main);
+  case AST_PRE_MAIN:
+    FreeAst(p->val->pre_main.pre_main);
+    FreeAst(p->val->pre_main.main);
+    break;
+  case AST_MAIN:
+    FreeAst(p->val->main.val);
+    FreeAst(p->val->main.suiv);
+    break;
+  default:
+    //fprintf(stderr,"[Erreur] Free type <%d>: %s non reconnu\n",p->type,p->type_str);
+    break;
+  }
+  free(p->val);
   free(p);
 }
 

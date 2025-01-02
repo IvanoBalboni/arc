@@ -170,6 +170,7 @@ void printCONTEXTE(contexte * tc){
   }
 }
 
+
 void ErrorTs(const char * errmsg){
   fprintf(stderr,"[TS error] %s\n",errmsg);
   exit(1);

@@ -2,716 +2,57 @@ LOAD #9       ; init l'adresse de GLOBAL
 STORE 3       ; PILE <- ACC
 LOAD #9       ; init l'adresse de la pile
 STORE 2       ; PILE <- ACC
-LOAD #10      ; ##DECLA FCT: Tri-Rapide##
+LOAD #10      ; ##DECLA FCT: fibonacci##
 STORE 1       ; LIGNE FCT
 LOAD 1        ; ADR FCT <- LIGNE FCT
 STORE @2      ; EMPILER
 INC 2         ; FIN EMPILER
-JUMP 33       ; ##FIN DECLA FCT## // JUMP Apres instructions FONCTION
-LOAD 2        ; ##DEBUT Tri-Rapide## // ACC <- PILE
+JUMP 36       ; ##FIN DECLA FCT## // JUMP Apres instructions FONCTION
+LOAD 2        ; ##DEBUT fibonacci## // ACC <- PILE
 STORE 4       ; LOCAL <- ACC
 LOAD #19      ; LIGNE RETOUR
 STORE 6       ; RETOUR_FCT <- LIGNE RETOUR
 LOAD #-999    ; VALEUR RETOUR PAR DEFAUT
 STORE 7       ; VALEUR RETOUR <- DEFAUT
 LOAD 2        ; ACC <- ADR PILE
-SUB #3        ; ACC <- ACC + ADRESSE PILE
+SUB #1        ; ACC <- ACC + ADRESSE PILE
 STORE 4       ; (FIN CHGT PILE) // Place LOCAL au debut des DECL & param
-LOAD 2        ; ##FIN Tri-Rapide## // ACC <- ADRESSE PILE
-SUB #3        ; ACC <- ACC - NB Variables declarees& param
+LOAD 2        ; ##FIN fibonacci## // ACC <- ADRESSE PILE
+SUB #1        ; ACC <- ACC - NB Variables declarees& param
 STORE 2       ; Recule la PILE
+DEC 2         ; DEPILER
+LOAD @2       ; ACC <- ADR_AFFECT avant FCT
+STORE 5       ; REOUR_FCT <- ACC
 DEC 2         ; DEPILER
 LOAD @2       ; ACC <- LOCAL avant appel FCT
 STORE 4       ; LOCAL <- ACC
 DEC 2         ; DEPILER
-LOAD @2       ; ACC <- RETOUR_FCT appel FCT
+LOAD @2       ; ACC <- RETOUR_FCT avant FCT
 STORE 6       ; REOUR_FCT <- ACC
 DEC 2         ; DEPILER
 LOAD @2       ; ACC <- LIGNE A JUMP APRES RETOUR FCT
 STORE 1       ; TEMP <- LIGNE A JUMP APRES RETOUR FCT
 LOAD 7        ; VALEUR RETOUR PAR DEFAUT
 JUMP @1       ; (RETOUR FCT) // JUMP A l'appel de FCT
-LOAD #39      ; ##DECLA FCT: Partitionner##
-STORE 1       ; LIGNE FCT
-LOAD 1        ; ADR FCT <- LIGNE FCT
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-JUMP 62       ; ##FIN DECLA FCT## // JUMP Apres instructions FONCTION
-LOAD 2        ; ##DEBUT Partitionner## // ACC <- PILE
-STORE 4       ; LOCAL <- ACC
-LOAD #48      ; LIGNE RETOUR
-STORE 6       ; RETOUR_FCT <- LIGNE RETOUR
-LOAD #-999    ; VALEUR RETOUR PAR DEFAUT
-STORE 7       ; VALEUR RETOUR <- DEFAUT
-LOAD 2        ; ACC <- ADR PILE
-SUB #3        ; ACC <- ACC + ADRESSE PILE
-STORE 4       ; (FIN CHGT PILE) // Place LOCAL au debut des DECL & param
-LOAD 2        ; ##FIN Partitionner## // ACC <- ADRESSE PILE
-SUB #3        ; ACC <- ACC - NB Variables declarees& param
-STORE 2       ; Recule la PILE
-DEC 2         ; DEPILER
-LOAD @2       ; ACC <- LOCAL avant appel FCT
-STORE 4       ; LOCAL <- ACC
-DEC 2         ; DEPILER
-LOAD @2       ; ACC <- RETOUR_FCT appel FCT
-STORE 6       ; REOUR_FCT <- ACC
-DEC 2         ; DEPILER
-LOAD @2       ; ACC <- LIGNE A JUMP APRES RETOUR FCT
-STORE 1       ; TEMP <- LIGNE A JUMP APRES RETOUR FCT
-LOAD 7        ; VALEUR RETOUR PAR DEFAUT
-JUMP @1       ; (RETOUR FCT) // JUMP A l'appel de FCT
-LOAD #68      ; ##DECLA FCT: Echanger##
-STORE 1       ; LIGNE FCT
-LOAD 1        ; ADR FCT <- LIGNE FCT
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-JUMP 137      ; ##FIN DECLA FCT## // JUMP Apres instructions FONCTION
-LOAD 2        ; ##DEBUT Echanger## // ACC <- PILE
-STORE 4       ; LOCAL <- ACC
-LOAD #123     ; LIGNE RETOUR
-STORE 6       ; RETOUR_FCT <- LIGNE RETOUR
-LOAD #-999    ; VALEUR RETOUR PAR DEFAUT
-STORE 7       ; VALEUR RETOUR <- DEFAUT
-LOAD 4        ; (DEBUT DECLA) // ACC <- adresse LOCAL
-ADD #3        ; ACC + position relative de  temp
-STORE 5       ; stocke l'adresse de temp
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #1        ; ACC + position relative de  i
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- i
-STORE 1       ; (DEBUT ID[POS] ) // TEMP <- POS
-LOAD 4        ; (DEBUT IDL) // ACC + adresse LOCAL
-ADD #0        ; ACC + position relative de L
-ADD 1         ; ACC <- ADR ID[POS]
-LOAD @0       ; (FIN IDL) // ACC ID [POS]
-STORE @5      ; (FIN DECLA) // temp <- ACC
-LOAD 2        ; ACC <- ADR PILE
-SUB #4        ; ACC <- ACC + ADRESSE PILE
-STORE 4       ; (FIN CHGT PILE) // Place LOCAL au debut des DECL & param
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #1        ; ACC + position relative de  i
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- i
-STORE 1       ; (DEBUT ID[POS] <-) // TEMP <- POS
-LOAD 4        ; ACC <- ADRESSE LOCAL
-ADD #0        ; ACC + position relative de  L
-ADD 1         ; ACC <- ADR ID[POS]
-STORE 5       ; ADR_AFFECT <- ADR ID[POS]
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #2        ; ACC + position relative de  j
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- j
-STORE 1       ; (DEBUT ID[POS] ) // TEMP <- POS
-LOAD 4        ; (DEBUT IDL) // ACC + adresse LOCAL
-ADD #0        ; ACC + position relative de L
-ADD 1         ; ACC <- ADR ID[POS]
-LOAD @0       ; (FIN IDL) // ACC ID [POS]
-STORE @5      ; (FIN ID[POS] <-) // ID[POS] <- ACC
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #2        ; ACC + position relative de  j
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- j
-STORE 1       ; (DEBUT ID[POS] <-) // TEMP <- POS
-LOAD 4        ; ACC <- ADRESSE LOCAL
-ADD #0        ; ACC + position relative de  L
-ADD 1         ; ACC <- ADR ID[POS]
-STORE 5       ; ADR_AFFECT <- ADR ID[POS]
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #3        ; ACC + position relative de  temp
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- temp
-STORE @5      ; (FIN ID[POS] <-) // ID[POS] <- ACC
-LOAD 2        ; ##FIN Echanger## // ACC <- ADRESSE PILE
-SUB #4        ; ACC <- ACC - NB Variables declarees& param
-STORE 2       ; Recule la PILE
-DEC 2         ; DEPILER
-LOAD @2       ; ACC <- LOCAL avant appel FCT
-STORE 4       ; LOCAL <- ACC
-DEC 2         ; DEPILER
-LOAD @2       ; ACC <- RETOUR_FCT appel FCT
-STORE 6       ; REOUR_FCT <- ACC
-DEC 2         ; DEPILER
-LOAD @2       ; ACC <- LIGNE A JUMP APRES RETOUR FCT
-STORE 1       ; TEMP <- LIGNE A JUMP APRES RETOUR FCT
-LOAD 7        ; VALEUR RETOUR PAR DEFAUT
-JUMP @1       ; (RETOUR FCT) // JUMP A l'appel de FCT
-LOAD 3        ; ##DECLA FCT: Avancer##
-ADD #3        ; ACC + ADR RELATIVE
-STORE 1       ; ADR FCT
-LOAD #143     ; LIGNE FCT
-STORE @1      ; ADR FCT <- LIGNE APPEL FCT
-JUMP 230      ; ##FIN DECLA FCT## // JUMP Apres instructions FONCTION
-LOAD 2        ; ##DEBUT Avancer## // ACC <- PILE
-STORE 4       ; LOCAL <- ACC
-LOAD #216     ; LIGNE RETOUR
-STORE 6       ; RETOUR_FCT <- LIGNE RETOUR
-LOAD #-999    ; VALEUR RETOUR PAR DEFAUT
-STORE 7       ; VALEUR RETOUR <- DEFAUT
-LOAD 2        ; ACC <- ADR PILE
-SUB #3        ; ACC <- ACC + ADRESSE PILE
-STORE 4       ; (FIN CHGT PILE) // Place LOCAL au debut des DECL & param
-LOAD 4        ; (DEBUT AFFECT) // ACC <- adresse LOCAL
-ADD #2        ; ACC - position relative de  i
-STORE 5       ; stocke l'adresse de i
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #2        ; ACC + position relative de  i
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- i
-LOAD 0        ; (DEBUT OP) // EMPILE EXP1 de l'op : EXP1 OP EXP2
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD #1       ; ACC <- 1
-STORE 1       ; TEMP <- ACC (EXP2)
-DEC 2         ; DEPILER
-LOAD @2       ; EXP1
-ADD 1         ; (FIN OP +) // ACC <- ACC (EXP1) + TEMP (EXP2)
-STORE @5      ; (FIN AFFECT) // i <- ACC
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #2        ; ACC + position relative de  i
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- i
-STORE 1       ; (DEBUT ID[POS] ) // TEMP <- POS
-LOAD 4        ; (DEBUT IDL) // ACC + adresse LOCAL
-ADD #0        ; ACC + position relative de L
-ADD 1         ; ACC <- ADR ID[POS]
-LOAD @0       ; (FIN IDL) // ACC ID [POS]
-LOAD 0        ; (DEBUT OP) // EMPILE EXP1 de l'op : EXP1 OP EXP2
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #1        ; ACC + position relative de  x
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- x
-STORE 1       ; TEMP <- ACC (EXP2)
-DEC 2         ; DEPILER
-LOAD @2       ; EXP1
-SUB 1         ; (DEBUT OP <) // ACC <- ACC (EXP1) - TEMP (EXP2)
-JUML 191      ; JUMP 3 lignes en dessous si < est vrai 
-LOAD #0       ; ACC <- 0 car < est faux 
-JUMP 192      ; (FIN OP <) // JUMP 2 lignes en dessous
-LOAD #1       ; (FIN OP <) // ACC <- 1 car < est vrai
-JUMZ 210      ; (TQ) // SI EXP TQ = 0 -> FTQ
-LOAD 4        ; (DEBUT AFFECT) // ACC <- adresse LOCAL
-ADD #2        ; ACC - position relative de  i
-STORE 5       ; stocke l'adresse de i
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #2        ; ACC + position relative de  i
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- i
-LOAD 0        ; (DEBUT OP) // EMPILE EXP1 de l'op : EXP1 OP EXP2
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD #1       ; ACC <- 1
-STORE 1       ; TEMP <- ACC (EXP2)
-DEC 2         ; DEPILER
-LOAD @2       ; EXP1
-ADD 1         ; (FIN OP +) // ACC <- ACC (EXP1) + TEMP (EXP2)
-STORE @5      ; (FIN AFFECT) // i <- ACC
-JUMP 168      ; (TQ) // JUMP DEBUT TQ
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #2        ; ACC + position relative de  i
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- i
-STORE 7       ;  (DEBUT RETURN) // RETOUR_FCT <- LIGNE RETOUR
-JUMP @6       ;  JUMP Apres les instructions de FONCTION
-LOAD 2        ; ##FIN Avancer## // ACC <- ADRESSE PILE
-SUB #3        ; ACC <- ACC - NB Variables declarees& param
-STORE 2       ; Recule la PILE
-DEC 2         ; DEPILER
-LOAD @2       ; ACC <- LOCAL avant appel FCT
-STORE 4       ; LOCAL <- ACC
-DEC 2         ; DEPILER
-LOAD @2       ; ACC <- RETOUR_FCT appel FCT
-STORE 6       ; REOUR_FCT <- ACC
-DEC 2         ; DEPILER
-LOAD @2       ; ACC <- LIGNE A JUMP APRES RETOUR FCT
-STORE 1       ; TEMP <- LIGNE A JUMP APRES RETOUR FCT
-LOAD 7        ; VALEUR RETOUR PAR DEFAUT
-JUMP @1       ; (RETOUR FCT) // JUMP A l'appel de FCT
-LOAD #236     ; ##DECLA FCT: Reculer##
-STORE 1       ; LIGNE FCT
-LOAD 1        ; ADR FCT <- LIGNE FCT
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-JUMP 323      ; ##FIN DECLA FCT## // JUMP Apres instructions FONCTION
-LOAD 2        ; ##DEBUT Reculer## // ACC <- PILE
-STORE 4       ; LOCAL <- ACC
-LOAD #309     ; LIGNE RETOUR
-STORE 6       ; RETOUR_FCT <- LIGNE RETOUR
-LOAD #-999    ; VALEUR RETOUR PAR DEFAUT
-STORE 7       ; VALEUR RETOUR <- DEFAUT
-LOAD 2        ; ACC <- ADR PILE
-SUB #3        ; ACC <- ACC + ADRESSE PILE
-STORE 4       ; (FIN CHGT PILE) // Place LOCAL au debut des DECL & param
-LOAD 4        ; (DEBUT AFFECT) // ACC <- adresse LOCAL
-ADD #2        ; ACC - position relative de  j
-STORE 5       ; stocke l'adresse de j
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #2        ; ACC + position relative de  j
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- j
-LOAD 0        ; (DEBUT OP) // EMPILE EXP1 de l'op : EXP1 OP EXP2
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD #1       ; ACC <- 1
-STORE 1       ; TEMP <- ACC (EXP2)
-DEC 2         ; DEPILER
-LOAD @2       ; EXP1
-ADD 1         ; (FIN OP +) // ACC <- ACC (EXP1) + TEMP (EXP2)
-STORE @5      ; (FIN AFFECT) // j <- ACC
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #2        ; ACC + position relative de  j
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- j
-STORE 1       ; (DEBUT ID[POS] ) // TEMP <- POS
-LOAD 4        ; (DEBUT IDL) // ACC + adresse LOCAL
-ADD #0        ; ACC + position relative de L
-ADD 1         ; ACC <- ADR ID[POS]
-LOAD @0       ; (FIN IDL) // ACC ID [POS]
-LOAD 0        ; (DEBUT OP) // EMPILE EXP1 de l'op : EXP1 OP EXP2
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #1        ; ACC + position relative de  x
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- x
-STORE 1       ; TEMP <- ACC (EXP2)
-DEC 2         ; DEPILER
-LOAD @2       ; EXP1
-SUB 1         ; (DEBUT OP >) // ACC <- ACC (EXP1) - TEMP (EXP2)
-JUMG 285      ; JUMP 3 lignes en dessous si > est vrai 
-LOAD #0       ; ACC <- 0 car > est faux 
-JUMP 285      ; (FIN OP >) // JUMP 2 lignes en dessous
-LOAD #1       ; (FIN OP >) // ACC <- 1 car >  est vrai
-JUMZ 303      ; (TQ) // SI EXP TQ = 0 -> FTQ
-LOAD 4        ; (DEBUT AFFECT) // ACC <- adresse LOCAL
-ADD #2        ; ACC - position relative de  j
-STORE 5       ; stocke l'adresse de j
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #2        ; ACC + position relative de  j
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- j
-LOAD 0        ; (DEBUT OP) // EMPILE EXP1 de l'op : EXP1 OP EXP2
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD #1       ; ACC <- 1
-STORE 1       ; TEMP <- ACC (EXP2)
-DEC 2         ; DEPILER
-LOAD @2       ; EXP1
-ADD 1         ; (FIN OP +) // ACC <- ACC (EXP1) + TEMP (EXP2)
-STORE @5      ; (FIN AFFECT) // j <- ACC
-JUMP 261      ; (TQ) // JUMP DEBUT TQ
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #2        ; ACC + position relative de  j
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- j
-STORE 7       ;  (DEBUT RETURN) // RETOUR_FCT <- LIGNE RETOUR
-JUMP @6       ;  JUMP Apres les instructions de FONCTION
-LOAD 2        ; ##FIN Reculer## // ACC <- ADRESSE PILE
-SUB #3        ; ACC <- ACC - NB Variables declarees& param
-STORE 2       ; Recule la PILE
-DEC 2         ; DEPILER
-LOAD @2       ; ACC <- LOCAL avant appel FCT
-STORE 4       ; LOCAL <- ACC
-DEC 2         ; DEPILER
-LOAD @2       ; ACC <- RETOUR_FCT appel FCT
-STORE 6       ; REOUR_FCT <- ACC
-DEC 2         ; DEPILER
-LOAD @2       ; ACC <- LIGNE A JUMP APRES RETOUR FCT
-STORE 1       ; TEMP <- LIGNE A JUMP APRES RETOUR FCT
-LOAD 7        ; VALEUR RETOUR PAR DEFAUT
-JUMP @1       ; (RETOUR FCT) // JUMP A l'appel de FCT
-LOAD 3        ; ##DECLA FCT: Partitionner##
-ADD #1        ; ACC + ADR RELATIVE
-STORE 1       ; ADR FCT
-LOAD #329     ; LIGNE FCT
-STORE @1      ; ADR FCT <- LIGNE APPEL FCT
-JUMP 580      ; ##FIN DECLA FCT## // JUMP Apres instructions FONCTION
-LOAD 2        ; ##DEBUT Partitionner## // ACC <- PILE
-STORE 4       ; LOCAL <- ACC
-LOAD #566     ; LIGNE RETOUR
-STORE 6       ; RETOUR_FCT <- LIGNE RETOUR
-LOAD #-999    ; VALEUR RETOUR PAR DEFAUT
-STORE 7       ; VALEUR RETOUR <- DEFAUT
-LOAD 4        ; (DEBUT DECLA) // ACC <- adresse LOCAL
-ADD #3        ; ACC + position relative de  i
-STORE 5       ; stocke l'adresse de i
-STORE @5      ; (FIN DECLA) // i <- ACC
-LOAD 4        ; (DEBUT DECLA) // ACC <- adresse LOCAL
-ADD #4        ; ACC + position relative de  j
-STORE 5       ; stocke l'adresse de j
-STORE @5      ; (FIN DECLA) // j <- ACC
-LOAD 4        ; (DEBUT DECLA) // ACC <- adresse LOCAL
-ADD #5        ; ACC + position relative de  x
-STORE 5       ; stocke l'adresse de x
-STORE @5      ; (FIN DECLA) // x <- ACC
-LOAD 2        ; ACC <- ADR PILE
-SUB #6        ; ACC <- ACC + ADRESSE PILE
-STORE 4       ; (FIN CHGT PILE) // Place LOCAL au debut des DECL & param
-LOAD 4        ; (DEBUT AFFECT) // ACC <- adresse LOCAL
-ADD #5        ; ACC - position relative de  x
-STORE 5       ; stocke l'adresse de x
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #1        ; ACC + position relative de  p
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- p
-STORE 1       ; (DEBUT ID[POS] ) // TEMP <- POS
-LOAD 4        ; (DEBUT IDL) // ACC + adresse LOCAL
-ADD #0        ; ACC + position relative de L
-ADD 1         ; ACC <- ADR ID[POS]
-LOAD @0       ; (FIN IDL) // ACC ID [POS]
-STORE @5      ; (FIN AFFECT) // x <- ACC
-LOAD 4        ; (DEBUT AFFECT) // ACC <- adresse LOCAL
-ADD #3        ; ACC - position relative de  i
-STORE 5       ; stocke l'adresse de i
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #1        ; ACC + position relative de  p
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- p
-STORE @5      ; (FIN AFFECT) // i <- ACC
-LOAD 4        ; (DEBUT AFFECT) // ACC <- adresse LOCAL
-ADD #4        ; ACC - position relative de  j
-STORE 5       ; stocke l'adresse de j
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #2        ; ACC + position relative de  r
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- r
-LOAD 0        ; (DEBUT OP) // EMPILE EXP1 de l'op : EXP1 OP EXP2
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD #1       ; ACC <- 1
-STORE 1       ; TEMP <- ACC (EXP2)
-DEC 2         ; DEPILER
-LOAD @2       ; EXP1
-ADD 1         ; (FIN OP +) // ACC <- ACC (EXP1) + TEMP (EXP2)
-STORE @5      ; (FIN AFFECT) // j <- ACC
-LOAD 4        ; (DEBUT AFFECT) // ACC <- adresse LOCAL
-ADD #4        ; ACC - position relative de  j
-STORE 5       ; stocke l'adresse de j
-LOAD #425     ; (DEBUT APPEL) // ACC <- ADR RETOUR APRES APPEL
-LOAD 0        ; 
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 6        ; ACC <- LIGNE FIN INST DE FCT
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 4        ; ACC <- ADR DEBUT LOCAL
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #0        ; ACC + position relative de  L
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- L
-LOAD 0        ; ACC = EXP de liste a empiler
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #5        ; ACC + position relative de  x
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- x
-LOAD 0        ; ACC = EXP de liste a empiler
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #4        ; ACC + position relative de  j
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- j
-LOAD 0        ; ACC = EXP de liste a empiler
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 3        ; ACC <- ADR DEBUT GLOBAL
-ADD #4        ; ACC + ADR RELATIVE FCT
-LOAD @0       ; ACC <- ADR LIGNE FCT
-JUMP @0       ; (FIN APPEL FCT) // JUMP au debut de la FCT
-STORE @5      ; (FIN AFFECT) // j <- ACC
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #3        ; ACC + position relative de  i
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- i
-LOAD 0        ; (DEBUT OP) // EMPILE EXP1 de l'op : EXP1 OP EXP2
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #4        ; ACC + position relative de  j
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- j
-STORE 1       ; TEMP <- ACC (EXP2)
-DEC 2         ; DEPILER
-LOAD @2       ; EXP1
-SUB 1         ; (DEBUT OP <) // ACC <- ACC (EXP1) - TEMP (EXP2)
-JUML 444      ; JUMP 3 lignes en dessous si < est vrai 
-LOAD #0       ; ACC <- 0 car < est faux 
-JUMP 445      ; (FIN OP <) // JUMP 2 lignes en dessous
-LOAD #1       ; (FIN OP <) // ACC <- 1 car < est vrai
-JUMZ 560      ; (TQ) // SI EXP TQ = 0 -> FTQ
-LOAD #481     ; (DEBUT APPEL) // ACC <- ADR RETOUR APRES APPEL
-LOAD 0        ; 
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 6        ; ACC <- LIGNE FIN INST DE FCT
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 4        ; ACC <- ADR DEBUT LOCAL
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #0        ; ACC + position relative de  L
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- L
-LOAD 0        ; ACC = EXP de liste a empiler
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #3        ; ACC + position relative de  i
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- i
-LOAD 0        ; ACC = EXP de liste a empiler
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #4        ; ACC + position relative de  j
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- j
-LOAD 0        ; ACC = EXP de liste a empiler
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 3        ; ACC <- ADR DEBUT GLOBAL
-ADD #2        ; ACC + ADR RELATIVE FCT
-LOAD @0       ; ACC <- ADR LIGNE FCT
-JUMP @0       ; (FIN APPEL FCT) // JUMP au debut de la FCT
-LOAD 4        ; (DEBUT AFFECT) // ACC <- adresse LOCAL
-ADD #4        ; ACC - position relative de  j
-STORE 5       ; stocke l'adresse de j
-LOAD #519     ; (DEBUT APPEL) // ACC <- ADR RETOUR APRES APPEL
-LOAD 0        ; 
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 6        ; ACC <- LIGNE FIN INST DE FCT
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 4        ; ACC <- ADR DEBUT LOCAL
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #0        ; ACC + position relative de  L
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- L
-LOAD 0        ; ACC = EXP de liste a empiler
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #5        ; ACC + position relative de  x
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- x
-LOAD 0        ; ACC = EXP de liste a empiler
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #4        ; ACC + position relative de  j
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- j
-LOAD 0        ; ACC = EXP de liste a empiler
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 3        ; ACC <- ADR DEBUT GLOBAL
-ADD #4        ; ACC + ADR RELATIVE FCT
-LOAD @0       ; ACC <- ADR LIGNE FCT
-JUMP @0       ; (FIN APPEL FCT) // JUMP au debut de la FCT
-STORE @5      ; (FIN AFFECT) // j <- ACC
-LOAD 4        ; (DEBUT AFFECT) // ACC <- adresse LOCAL
-ADD #3        ; ACC - position relative de  i
-STORE 5       ; stocke l'adresse de i
-LOAD #558     ; (DEBUT APPEL) // ACC <- ADR RETOUR APRES APPEL
-LOAD 0        ; 
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 6        ; ACC <- LIGNE FIN INST DE FCT
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 4        ; ACC <- ADR DEBUT LOCAL
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #0        ; ACC + position relative de  L
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- L
-LOAD 0        ; ACC = EXP de liste a empiler
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #5        ; ACC + position relative de  x
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- x
-LOAD 0        ; ACC = EXP de liste a empiler
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #3        ; ACC + position relative de  i
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- i
-LOAD 0        ; ACC = EXP de liste a empiler
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 3        ; ACC <- ADR DEBUT GLOBAL
-ADD #3        ; ACC + ADR RELATIVE FCT
-LOAD @0       ; ACC <- ADR LIGNE FCT
-JUMP @0       ; (FIN APPEL FCT) // JUMP au debut de la FCT
-STORE @5      ; (FIN AFFECT) // i <- ACC
-JUMP 426      ; (TQ) // JUMP DEBUT TQ
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #4        ; ACC + position relative de  j
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- j
-STORE 7       ;  (DEBUT RETURN) // RETOUR_FCT <- LIGNE RETOUR
-JUMP @6       ;  JUMP Apres les instructions de FONCTION
-LOAD 2        ; ##FIN Partitionner## // ACC <- ADRESSE PILE
-SUB #6        ; ACC <- ACC - NB Variables declarees& param
-STORE 2       ; Recule la PILE
-DEC 2         ; DEPILER
-LOAD @2       ; ACC <- LOCAL avant appel FCT
-STORE 4       ; LOCAL <- ACC
-DEC 2         ; DEPILER
-LOAD @2       ; ACC <- RETOUR_FCT appel FCT
-STORE 6       ; REOUR_FCT <- ACC
-DEC 2         ; DEPILER
-LOAD @2       ; ACC <- LIGNE A JUMP APRES RETOUR FCT
-STORE 1       ; TEMP <- LIGNE A JUMP APRES RETOUR FCT
-LOAD 7        ; VALEUR RETOUR PAR DEFAUT
-JUMP @1       ; (RETOUR FCT) // JUMP A l'appel de FCT
-LOAD 3        ; ##DECLA FCT: Tri-Rapide##
+LOAD 3        ; ##DECLA FCT: fibonacci##
 ADD #0        ; ACC + ADR RELATIVE
 STORE 1       ; ADR FCT
-LOAD #586     ; LIGNE FCT
+LOAD #42      ; LIGNE FCT
 STORE @1      ; ADR FCT <- LIGNE APPEL FCT
-JUMP 750      ; ##FIN DECLA FCT## // JUMP Apres instructions FONCTION
-LOAD 2        ; ##DEBUT Tri-Rapide## // ACC <- PILE
+JUMP 166      ; ##FIN DECLA FCT## // JUMP Apres instructions FONCTION
+LOAD 2        ; ##DEBUT fibonacci## // ACC <- PILE
 STORE 4       ; LOCAL <- ACC
-LOAD #736     ; LIGNE RETOUR
+LOAD #149     ; LIGNE RETOUR
 STORE 6       ; RETOUR_FCT <- LIGNE RETOUR
 LOAD #-999    ; VALEUR RETOUR PAR DEFAUT
 STORE 7       ; VALEUR RETOUR <- DEFAUT
-LOAD 4        ; (DEBUT DECLA) // ACC <- adresse LOCAL
-ADD #3        ; ACC + position relative de  q
-STORE 5       ; stocke l'adresse de q
-STORE @5      ; (FIN DECLA) // q <- ACC
 LOAD 2        ; ACC <- ADR PILE
-SUB #4        ; ACC <- ACC + ADRESSE PILE
+SUB #1        ; ACC <- ACC + ADRESSE PILE
 STORE 4       ; (FIN CHGT PILE) // Place LOCAL au debut des DECL & param
 LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #1        ; ACC + position relative de  p
+ADD #0        ; ACC + position relative de  i
 STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- p
-LOAD 0        ; (DEBUT OP) // EMPILE EXP1 de l'op : EXP1 OP EXP2
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #2        ; ACC + position relative de  r
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- r
-STORE 1       ; TEMP <- ACC (EXP2)
-DEC 2         ; DEPILER
-LOAD @2       ; EXP1
-SUB 1         ; (DEBUT OP <) // ACC <- ACC (EXP1) - TEMP (EXP2)
-JUML 617      ; JUMP 3 lignes en dessous si < est vrai 
-LOAD #0       ; ACC <- 0 car < est faux 
-JUMP 618      ; (FIN OP <) // JUMP 2 lignes en dessous
-LOAD #1       ; (FIN OP <) // ACC <- 1 car < est vrai
-JUMZ 736      ; (DEBUT SI) // JUMP a SINON si exp = 0
-LOAD 4        ; (DEBUT AFFECT) // ACC <- adresse LOCAL
-ADD #3        ; ACC - position relative de  q
-STORE 5       ; stocke l'adresse de q
-LOAD #657     ; (DEBUT APPEL) // ACC <- ADR RETOUR APRES APPEL
-LOAD 0        ; 
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 6        ; ACC <- LIGNE FIN INST DE FCT
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 4        ; ACC <- ADR DEBUT LOCAL
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #0        ; ACC + position relative de  L
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- L
-LOAD 0        ; ACC = EXP de liste a empiler
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #1        ; ACC + position relative de  p
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- p
-LOAD 0        ; ACC = EXP de liste a empiler
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #2        ; ACC + position relative de  r
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- r
-LOAD 0        ; ACC = EXP de liste a empiler
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 3        ; ACC <- ADR DEBUT GLOBAL
-ADD #1        ; ACC + ADR RELATIVE FCT
-LOAD @0       ; ACC <- ADR LIGNE FCT
-JUMP @0       ; (FIN APPEL FCT) // JUMP au debut de la FCT
-STORE @5      ; (FIN AFFECT) // q <- ACC
-LOAD #693     ; (DEBUT APPEL) // ACC <- ADR RETOUR APRES APPEL
-LOAD 0        ; 
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 6        ; ACC <- LIGNE FIN INST DE FCT
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 4        ; ACC <- ADR DEBUT LOCAL
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #0        ; ACC + position relative de  L
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- L
-LOAD 0        ; ACC = EXP de liste a empiler
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #1        ; ACC + position relative de  p
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- p
-LOAD 0        ; ACC = EXP de liste a empiler
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #3        ; ACC + position relative de  q
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- q
-LOAD 0        ; ACC = EXP de liste a empiler
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 3        ; ACC <- ADR DEBUT GLOBAL
-ADD #0        ; ACC + ADR RELATIVE FCT
-LOAD @0       ; ACC <- ADR LIGNE FCT
-JUMP @0       ; (FIN APPEL FCT) // JUMP au debut de la FCT
-LOAD #736     ; (DEBUT APPEL) // ACC <- ADR RETOUR APRES APPEL
-LOAD 0        ; 
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 6        ; ACC <- LIGNE FIN INST DE FCT
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 4        ; ACC <- ADR DEBUT LOCAL
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #0        ; ACC + position relative de  L
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- L
-LOAD 0        ; ACC = EXP de liste a empiler
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #3        ; ACC + position relative de  q
-STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- q
+LOAD @1       ; (FIN ID) // ACC <- i
 LOAD 0        ; (DEBUT OP) // EMPILE EXP1 de l'op : EXP1 OP EXP2
 STORE @2      ; EMPILER
 INC 2         ; FIN EMPILER
@@ -719,14 +60,45 @@ LOAD #1       ; ACC <- 1
 STORE 1       ; TEMP <- ACC (EXP2)
 DEC 2         ; DEPILER
 LOAD @2       ; EXP1
-ADD 1         ; (FIN OP +) // ACC <- ACC (EXP1) + TEMP (EXP2)
-LOAD 0        ; ACC = EXP de liste a empiler
+SUB 1         ; (DEBUT OP <=) // ACC <- ACC (EXP1) - TEMP (EXP2)
+DEC 0         ; ACC <- ACC - 1
+JUML 67       ; JUMP 3 lignes en dessous si <= est vrai 
+LOAD #0       ; ACC <- 0 car <= est faux 
+JUMP 68       ; (FIN OP <=) // JUMP 2 lignes en dessous
+LOAD #1       ; (FIN OP <=) // ACC <- 1 car <= est vrai
+JUMZ 76       ; (DEBUT SI) // JUMP a SINON si exp = 0
+LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
+ADD #0        ; ACC + position relative de  i
+STORE 1       ; TEMP <- ACC (ID)
+LOAD @1       ; (FIN ID) // ACC <- i
+STORE 7       ;  (DEBUT RETURN) // RETOUR_FCT <- LIGNE RETOUR
+JUMP @6       ;  JUMP Apres les instructions de FONCTION
+JUMP 148      ; (FIN SI) // JUMP APRES INST SINON
+LOAD #108     ; (DEBUT APPEL) // ACC <- ADR RETOUR APRES APPEL
+LOAD 0        ; 
+STORE @2      ; EMPILER
+INC 2         ; FIN EMPILER
+LOAD 6        ; ACC <- LIGNE FIN INST DE FCT
+STORE @2      ; EMPILER
+INC 2         ; FIN EMPILER
+LOAD 4        ; ACC <- ADR DEBUT LOCAL
+STORE @2      ; EMPILER
+INC 2         ; FIN EMPILER
+LOAD 5        ; ACC <- ADR_AFFECT
 STORE @2      ; EMPILER
 INC 2         ; FIN EMPILER
 LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
-ADD #2        ; ACC + position relative de  r
+ADD #0        ; ACC + position relative de  i
 STORE 1       ; TEMP <- ACC (ID)
-LOAD @1       ; (FIN ID) // ACC <- r
+LOAD @1       ; (FIN ID) // ACC <- i
+LOAD 0        ; (DEBUT OP) // EMPILE EXP1 de l'op : EXP1 OP EXP2
+STORE @2      ; EMPILER
+INC 2         ; FIN EMPILER
+LOAD #2       ; ACC <- 2
+STORE 1       ; TEMP <- ACC (EXP2)
+DEC 2         ; DEPILER
+LOAD @2       ; EXP1
+SUB 1         ; (FIN OP -) // ACC <- ACC (EXP1) - TEMP (EXP2)
 LOAD 0        ; ACC = EXP de liste a empiler
 STORE @2      ; EMPILER
 INC 2         ; FIN EMPILER
@@ -734,14 +106,58 @@ LOAD 3        ; ACC <- ADR DEBUT GLOBAL
 ADD #0        ; ACC + ADR RELATIVE FCT
 LOAD @0       ; ACC <- ADR LIGNE FCT
 JUMP @0       ; (FIN APPEL FCT) // JUMP au debut de la FCT
-LOAD 2        ; ##FIN Tri-Rapide## // ACC <- ADRESSE PILE
-SUB #4        ; ACC <- ACC - NB Variables declarees& param
+LOAD 0        ; (DEBUT OP) // EMPILE EXP1 de l'op : EXP1 OP EXP2
+STORE @2      ; EMPILER
+INC 2         ; FIN EMPILER
+LOAD #143     ; (DEBUT APPEL) // ACC <- ADR RETOUR APRES APPEL
+LOAD 0        ; 
+STORE @2      ; EMPILER
+INC 2         ; FIN EMPILER
+LOAD 6        ; ACC <- LIGNE FIN INST DE FCT
+STORE @2      ; EMPILER
+INC 2         ; FIN EMPILER
+LOAD 4        ; ACC <- ADR DEBUT LOCAL
+STORE @2      ; EMPILER
+INC 2         ; FIN EMPILER
+LOAD 5        ; ACC <- ADR_AFFECT
+STORE @2      ; EMPILER
+INC 2         ; FIN EMPILER
+LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
+ADD #0        ; ACC + position relative de  i
+STORE 1       ; TEMP <- ACC (ID)
+LOAD @1       ; (FIN ID) // ACC <- i
+LOAD 0        ; (DEBUT OP) // EMPILE EXP1 de l'op : EXP1 OP EXP2
+STORE @2      ; EMPILER
+INC 2         ; FIN EMPILER
+LOAD #1       ; ACC <- 1
+STORE 1       ; TEMP <- ACC (EXP2)
+DEC 2         ; DEPILER
+LOAD @2       ; EXP1
+SUB 1         ; (FIN OP -) // ACC <- ACC (EXP1) - TEMP (EXP2)
+LOAD 0        ; ACC = EXP de liste a empiler
+STORE @2      ; EMPILER
+INC 2         ; FIN EMPILER
+LOAD 3        ; ACC <- ADR DEBUT GLOBAL
+ADD #0        ; ACC + ADR RELATIVE FCT
+LOAD @0       ; ACC <- ADR LIGNE FCT
+JUMP @0       ; (FIN APPEL FCT) // JUMP au debut de la FCT
+STORE 1       ; TEMP <- ACC (EXP2)
+DEC 2         ; DEPILER
+LOAD @2       ; EXP1
+ADD 1         ; (FIN OP +) // ACC <- ACC (EXP1) + TEMP (EXP2)
+STORE 7       ;  (DEBUT RETURN) // RETOUR_FCT <- LIGNE RETOUR
+JUMP @6       ;  JUMP Apres les instructions de FONCTION
+LOAD 2        ; ##FIN fibonacci## // ACC <- ADRESSE PILE
+SUB #1        ; ACC <- ACC - NB Variables declarees& param
 STORE 2       ; Recule la PILE
+DEC 2         ; DEPILER
+LOAD @2       ; ACC <- ADR_AFFECT avant FCT
+STORE 5       ; REOUR_FCT <- ACC
 DEC 2         ; DEPILER
 LOAD @2       ; ACC <- LOCAL avant appel FCT
 STORE 4       ; LOCAL <- ACC
 DEC 2         ; DEPILER
-LOAD @2       ; ACC <- RETOUR_FCT appel FCT
+LOAD @2       ; ACC <- RETOUR_FCT avant FCT
 STORE 6       ; REOUR_FCT <- ACC
 DEC 2         ; DEPILER
 LOAD @2       ; ACC <- LIGNE A JUMP APRES RETOUR FCT
@@ -749,55 +165,24 @@ STORE 1       ; TEMP <- LIGNE A JUMP APRES RETOUR FCT
 LOAD 7        ; VALEUR RETOUR PAR DEFAUT
 JUMP @1       ; (RETOUR FCT) // JUMP A l'appel de FCT
 LOAD 3        ; ##DEBUT MAIN## // ACC <- PILE
-ADD #9        ; AVANCE LA PILE DU NB DE VAR LOCALES
+ADD #1        ; AVANCE LA PILE DU NB DE VAR LOCALES
 STORE 2       ; 
 STORE 4       ; LOCAL <- ACC
-LOAD #826     ; LIGNE FIN MAIN
+LOAD #209     ; LIGNE FIN MAIN
 STORE 6       ; LIGNE FIN MAIN
-LOAD #2       ; ACC <- 2
-LOAD 0        ; ACC = EXP de liste a empiler
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD #3       ; ACC <- 3
-LOAD 0        ; ACC = EXP de liste a empiler
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD #1       ; ACC <- 1
-LOAD 0        ; ACC = EXP de liste a empiler
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD #5       ; ACC <- 5
-LOAD 0        ; ACC = EXP de liste a empiler
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD #6       ; ACC <- 6
-LOAD 0        ; ACC = EXP de liste a empiler
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD #4       ; ACC <- 4
-LOAD 0        ; ACC = EXP de liste a empiler
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD #9       ; ACC <- 9
-LOAD 0        ; ACC = EXP de liste a empiler
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD #7       ; ACC <- 7
-LOAD 0        ; ACC = EXP de liste a empiler
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD #8       ; ACC <- 8
-LOAD 0        ; ACC = EXP de liste a empiler
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD #0       ; ACC <- 0
-LOAD 0        ; ACC = EXP de liste a empiler
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
+LOAD 4        ; (DEBUT DECLA) // ACC <- adresse LOCAL
+ADD #0        ; ACC + position relative de  i
+STORE 5       ; stocke l'adresse de i
+STORE @5      ; (FIN DECLA) // i <- ACC
 LOAD 2        ; ACC <- ADR PILE
-ADD #0        ; ACC <- ACC + ADRESSE PILE
+ADD #1        ; ACC <- ACC + ADRESSE PILE
 STORE 2       ; (FIN CHGT PILE) // Place LOCAL au debut des DECL & param
-LOAD #826     ; (DEBUT APPEL) // ACC <- ADR RETOUR APRES APPEL
+LOAD 4        ; (DEBUT AFFECT) // ACC <- adresse LOCAL
+ADD #0        ; ACC - position relative de  i
+STORE 5       ; stocke l'adresse de i
+READ          ; ACC <- ENTREE[I++]
+STORE @5      ; (FIN AFFECT) // i <- ACC
+LOAD #208     ; (DEBUT APPEL) // ACC <- ADR RETOUR APRES APPEL
 LOAD 0        ; 
 STORE @2      ; EMPILER
 INC 2         ; FIN EMPILER
@@ -807,16 +192,13 @@ INC 2         ; FIN EMPILER
 LOAD 4        ; ACC <- ADR DEBUT LOCAL
 STORE @2      ; EMPILER
 INC 2         ; FIN EMPILER
-LOAD 4        ; (DEBUT ADR) // ACC <- adresse LOCAL
-ADD #0        ; (FIN ADR) // ACC + pos. de L
-LOAD 0        ; ACC = EXP de liste a empiler
+LOAD 5        ; ACC <- ADR_AFFECT
 STORE @2      ; EMPILER
 INC 2         ; FIN EMPILER
-LOAD #0       ; ACC <- 0
-LOAD 0        ; ACC = EXP de liste a empiler
-STORE @2      ; EMPILER
-INC 2         ; FIN EMPILER
-LOAD #10      ; ACC <- 10
+LOAD 4        ; (DEBUT ID) // ACC <- adresse LOCAL
+ADD #0        ; ACC + position relative de  i
+STORE 1       ; TEMP <- ACC (ID)
+LOAD @1       ; (FIN ID) // ACC <- i
 LOAD 0        ; ACC = EXP de liste a empiler
 STORE @2      ; EMPILER
 INC 2         ; FIN EMPILER
@@ -824,4 +206,5 @@ LOAD 3        ; ACC <- ADR DEBUT GLOBAL
 ADD #0        ; ACC + ADR RELATIVE FCT
 LOAD @0       ; ACC <- ADR LIGNE FCT
 JUMP @0       ; (FIN APPEL FCT) // JUMP au debut de la FCT
+WRITE         ; SORTIE[I++] <- ACC
 STOP

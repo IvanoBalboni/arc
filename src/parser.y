@@ -186,6 +186,7 @@ int main( int argc, char * argv[] ) {
 
   printf("codegen fini.\n" );
   fclose(yyin);
+  FreeAst(ARBRE_ABSTRAIT);
 }
 
 

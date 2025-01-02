@@ -42,7 +42,9 @@ ID              [a-zA-Z_][-a-zA-Z_0-9]*
 "ALGO"          { return ALGO;}
 "LIRE()"        { return LIRE;}
 "ECRIRE"        { return ECRIRE;}
+"AFFICHER"      { return ECRIRE;}
 "RETOURNE"      { return RETOURNE;}
+"RENVOYER"      { return RETOURNE;}
 "VAR"           { return VAR;}
 "DEBUT"         { return DEBUT;}
 "FIN"           { return FIN;}

@@ -274,7 +274,7 @@ void semanticFCT(ast * p){
   
   decl_len = (p->val->algo.decl_liste != NULL) ? p->val->algo.decl_liste->codelen : 0;
   instlen = (p->val->algo.inst != NULL) ? p->val->algo.inst->codelen : 0;
-  p->codelen = 29 + decl_len + instlen;
+  p->codelen = 32 + decl_len + instlen;
   LOCAL_ADR = 0;
   setCONTEXTE("GLOBAL");
 }
@@ -296,7 +296,7 @@ void semanticAPPL(ast * p){
   setCONTEXTE(p->val->appel.id);
   if (param->val->liste.taille != RechercherSymb(TABLE_SYMBOLES, "param", TS_FCT_PROTO)->adr)
     ErrorSemantic("APPEL: Pas le meme nb. de parametres que le prototype.");
-  p->codelen = 14 + p->val->appel.exp->codelen;
+  p->codelen = 17 + p->val->appel.exp->codelen;
   setCONTEXTE(temp);
 }
 

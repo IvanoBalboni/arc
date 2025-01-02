@@ -1,19 +1,10 @@
-ALGO TESTREC ( a, @L, b );
-
-ALGO TESTREC ( a, @L, b ) #va modifier L[8] jusqua ce que L[8] >= a
+MAIN()# print la (valeur en entree + 5) * 10 
+VAR a;
+VAR b;
+VAR c <- 0;
 DEBUT
-	L[8] <- b;
-	SI L[8] < a FAIRE
-		b <- L[8] +1;
-		TESTREC( a, L, b);
-	FSI
-	ECRIRE b;
-FIN
-
-MAIN()
-VAR L[10] <- [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-VAR a <- 5;
-VAR b <- 3;
-DEBUT
-	TESTREC ( a, @L, b);
+a <- 10;
+b <- LIRE();
+c <- a * (b + 5);
+ECRIRE c;
 FIN

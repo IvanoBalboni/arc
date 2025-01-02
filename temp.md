@@ -2,18 +2,12 @@ Compilateur ALGO &#10140; RAM
 =======================
 ## Introduction
 Compilateur d'un langage de description d'algorithmes vers un code executable en machine RAM.\
-La machine utilisee pour tester les programme est la suivante: https://zanotti.univ-tln.fr/RAM/newram.php\
-[Specificites du programme](#specificites-du-programme) ||
-[Exemples](#exemples) ||
-[Syntaxe & Grammaire](#syntaxe--grammaire) ||
-[AST](#arbre-de-syntaxe-abstrait) ||
-[Semantique & Table de Symboles](#semantique--table-de-symboles) ||
-[Generation de code](#generation-de-code)
+La machine utilisee pour tester les programme est la suivante: https://zanotti.univ-tln.fr/RAM/newram.php
+
 ## Specificites du programme
 Les declarations globales (var. globales et fonctions) se font avant l'execution du MAIN( ),
-il y a donc un STOP juste apres la derniere instruction du MAIN( ).\
-[Registre](#registre) || [Expression](#expression) || [Liste](#liste) || [Pointeurs](#pointeurs) ||
-[Affectation](#affectation) || [Appel de fonction](#appel) || [Fonction](#fonction)
+il y a donc un STOP juste apres la derniere instruction du MAIN( ).
+
 ### Registre:
 |               |                                                   |
 |---------------|---------------------------------------------------|
@@ -84,34 +78,16 @@ Charge VALEUR_RETOUR puis JUMP a la ligne apres l'appel de fonction.
 - Retour de fonction
 - condition SI SINON
 ### tri_rapide & triselect.algo
-Ces 2 fichiers se compilent, l'AST et la TS sont juste cependant le code RAM genere est trop lourd pour etre lu par la machine RAM utilisee pour executer les programmes.
+Ces 2 fichiers se compilent, l'AST et la TS sont generes cependant le code RAM genere est trop lourd pour etre lu par la machine RAM utilisee pour executer les programmes.
 
-## Syntaxe & Grammaire
-### Programme
-### Instructions
-### Expressions
-### Fonctions
 ## Arbre de syntaxe abstrait
 L'AST possede une valeur qui est une union de types en fonction du noeud ou de la feuille de l'AST.
-### Programme
-### Instructions
-### Expressions
-### Fonctions
 ## Semantique & Table de symboles
 Determine la longueur du code, genere la table de symboles et filtre des erreurs semantiques\
 La table de symboles contiendra toujours au moins GLOBAL et MAIN comme contexte.\
 Lors de la creation d'une fonction, le 1er symbole du contexte sert a verifier le nombre de parametres de la fonction.
-### Programme
 
-### Instructions
-### Expressions
-### Fonctions
-#### Declaration
 
-#### Appel
-Verifie le nombre de parametres et si la fonction est dans la TS
-## Generation de code
-### Programme
-### Instructions
-### Expressions
-### Fonctions
+
+
+

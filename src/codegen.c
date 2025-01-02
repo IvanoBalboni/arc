@@ -388,7 +388,7 @@ void codegenFCT(ast* p){
   genPrintVal("JUMP %-8d ; ","##FIN DECLA FCT## // JUMP Apres instructions FONCTION\n", LEN - 5 + p->codelen);
 
   codegenInitCONTEXTE(p->val->algo.id);// DEBUT FCT, 2 lignes
-  genPrintVal("LOAD #%-7d ; ", "LIGNE RETOUR\n", LEN -29 + 7 + p->codelen);
+  genPrintVal("LOAD #%-7d ; ", "LIGNE RETOUR\n", LEN -32 + 7 + p->codelen);
   genPrintVal("STORE %-7d ; ", "RETOUR_FCT <- LIGNE RETOUR\n", RETOUR_FCT);
   genPrintVal("LOAD #%-7d ; ", "VALEUR RETOUR PAR DEFAUT\n", -999);
   genPrintVal("STORE %-7d ; ", "VALEUR RETOUR <- DEFAUT\n", VALEUR_RETOUR);
@@ -401,9 +401,11 @@ void codegenFCT(ast* p){
   //DEBUT REOUR 12 lignes
 
   codegenSortieCONTEXTE(temp);//3 lignes
+  DEPILER("ACC <- ADR_AFFECT avant FCT\n");//2 lignes
+  genPrintVal("STORE %-7d ; ", "REOUR_FCT <- ACC\n", ADR_AFFECT);
   DEPILER("ACC <- LOCAL avant appel FCT\n");//2 lignes
   genPrintVal("STORE %-7d ; ", "LOCAL <- ACC\n", LOCAL);
-  DEPILER("ACC <- RETOUR_FCT appel FCT\n");//2 lignes
+  DEPILER("ACC <- RETOUR_FCT avant FCT\n");//2 lignes
   genPrintVal("STORE %-7d ; ", "REOUR_FCT <- ACC\n", RETOUR_FCT);
   DEPILER("ACC <- LIGNE A JUMP APRES RETOUR FCT\n");//2 lignes
   STOCKER("TEMP <- LIGNE A JUMP APRES RETOUR FCT\n");
@@ -419,6 +421,7 @@ void codegenAPPEL_FCT(ast* p){
   EMPILER(0, "\n");//3 lignes
   EMPILER(RETOUR_FCT, "ACC <- LIGNE FIN INST DE FCT\n");
   EMPILER(LOCAL, "ACC <- ADR DEBUT LOCAL\n");//3 lignes
+  EMPILER(ADR_AFFECT, "ACC <- ADR_AFFECT\n");
   codegen(p->val->appel.exp);
   genPrintVal("LOAD %-8d ; ", "ACC <- ADR DEBUT GLOBAL\n", GLOBAL);
   genPrintVal("ADD #%-8d ; ", "ACC + ADR RELATIVE FCT\n", s->adr);

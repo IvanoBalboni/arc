@@ -1,10 +1,13 @@
-MAIN()# print la (valeur en entree + 5) * 10 
-VAR a;
-VAR b;
-VAR c <- 0;
+  VAR L[5] <- [0,1,2,3,4];
+  VAR T[5] <- [10,11,12,13,14];
+
+MAIN()
+  VAR L[5] <- [20,21,22,23,24];
+  VAR i <- 0;
 DEBUT
-a <- 10;
-b <- LIRE();
-c <- a * (b + 5);
-ECRIRE c;
+  TQ i < 5 FAIRE
+    ECRIRE L[i];
+    ECRIRE T[i];
+    i <- i +1;
+  FTQ
 FIN
