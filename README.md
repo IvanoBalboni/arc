@@ -1,7 +1,7 @@
 Compilateur ALGO &#10140; RAM
 =======================
 ## Introduction
-Compilateur d'un langage de description d'algorithmes vers un code executable en machine RAM.\
+Compilateur d'un langage de description d'algorithmes vers un code executable en machine RAM.
 La machine utilisee pour tester les programme est la suivante: https://zanotti.univ-tln.fr/RAM/newram.php\
 [Specificites du programme](#specificites-du-programme) ||
 [Exemples](#exemples) ||
